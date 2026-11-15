@@ -1,0 +1,165 @@
+{
+  "id": 50611,
+  "drs": "interfac",
+  "num_frames": 17,
+  "palette_id": 50507,
+  "sheet_width": 672,
+  "sheet_height": 39,
+  "sheet_png": "interfac/50611_sheet.png",
+  "frames_dir": "interfac/50611_frames",
+  "frames": [
+    {
+      "frame": 0,
+      "x": 0,
+      "y": 0,
+      "width": 39,
+      "height": 39,
+      "hotspot_x": 0,
+      "hotspot_y": 0
+    },
+    {
+      "frame": 1,
+      "x": 41,
+      "y": 0,
+      "width": 39,
+      "height": 39,
+      "hotspot_x": 0,
+      "hotspot_y": 0
+    },
+    {
+      "frame": 2,
+      "x": 82,
+      "y": 0,
+      "width": 39,
+      "height": 39,
+      "hotspot_x": 0,
+      "hotspot_y": 0
+    },
+    {
+      "frame": 3,
+      "x": 123,
+      "y": 0,
+      "width": 39,
+      "height": 39,
+      "hotspot_x": 0,
+      "hotspot_y": 0
+    },
+    {
+      "frame": 4,
+      "x": 164,
+      "y": 0,
+      "width": 39,
+      "height": 39,
+      "hotspot_x": 0,
+      "hotspot_y": 0
+    },
+    {
+      "frame": 5,
+      "x": 205,
+      "y": 0,
+      "width": 39,
+      "height": 39,
+      "hotspot_x": 0,
+      "hotspot_y": 0
+    },
+    {
+      "frame": 6,
+      "x": 246,
+      "y": 0,
+      "width": 39,
+      "height": 39,
+      "hotspot_x": 0,
+      "hotspot_y": 0
+    },
+    {
+      "frame": 7,
+      "x": 287,
+      "y": 0,
+      "width": 39,
+      "height": 39,
+      "hotspot_x": 0,
+      "hotspot_y": 0
+    },
+    {
+      "frame": 8,
+      "x": 328,
+      "y": 0,
+      "width": 39,
+      "height": 39,
+      "hotspot_x": 0,
+      "hotspot_y": 0
+    },
+    {
+      "frame": 9,
+      "x": 369,
+      "y": 0,
+      "width": 39,
+      "height": 39,
+      "hotspot_x": 0,
+      "hotspot_y": 0
+    },
+    {
+      "frame": 10,
+      "x": 410,
+      "y": 0,
+      "width": 39,
+      "height": 39,
+      "hotspot_x": 0,
+      "hotspot_y": 0
+    },
+    {
+      "frame": 11,
+      "x": 451,
+      "y": 0,
+      "width": 39,
+      "height": 39,
+      "hotspot_x": 0,
+      "hotspot_y": 0
+    },
+    {
+      "frame": 12,
+      "x": 492,
+      "y": 0,
+      "width": 39,
+      "height": 39,
+      "hotspot_x": 0,
+      "hotspot_y": 0
+    },
+    {
+      "frame": 13,
+      "x": 533,
+      "y": 0,
+      "width": 39,
+      "height": 39,
+      "hotspot_x": 0,
+      "hotspot_y": 0
+    },
+    {
+      "frame": 14,
+      "x": 574,
+      "y": 0,
+      "width": 39,
+      "height": 39,
+      "hotspot_x": 0,
+      "hotspot_y": 0
+    },
+    {
+      "frame": 15,
+      "x": 615,
+      "y": 0,
+      "width": 39,
+      "height": 39,
+      "hotspot_x": 0,
+      "hotspot_y": 0
+    },
+    {
+      "frame": 16,
+      "x": 656,
+      "y": 0,
+      "width": 14,
+      "height": 16,
+      "hotspot_x": -12,
+      "hotspot_y": -11
+    }
+  ]
+}

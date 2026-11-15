@@ -1,0 +1,23 @@
+# Data extracted from game (copyright Microsoft/Ensemble) — raw dump, regenerable, not needed by the build
+raw/
+# assets/ui/ is committed so GitHub Actions can build the Pages demo (owner's decision 2026-11-15)
+
+# Shortcut to the local game folder
+game.lnk
+
+# Source artwork (processed copies live in assets/hub/)
+/*.png
+
+# Python cache
+__pycache__/
+*.pyc
+
+# OS files
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+
+# Node / build
+node_modules/
+dist/

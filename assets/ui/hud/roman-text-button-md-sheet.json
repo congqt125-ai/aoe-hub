@@ -1,0 +1,30 @@
+{
+  "id": 53008,
+  "drs": "interfac",
+  "num_frames": 2,
+  "palette_id": 50500,
+  "sheet_width": 220,
+  "sheet_height": 19,
+  "sheet_png": "interfac/53008_sheet.png",
+  "frames_dir": "interfac/53008_frames",
+  "frames": [
+    {
+      "frame": 0,
+      "x": 0,
+      "y": 0,
+      "width": 108,
+      "height": 19,
+      "hotspot_x": 0,
+      "hotspot_y": 0
+    },
+    {
+      "frame": 1,
+      "x": 110,
+      "y": 0,
+      "width": 108,
+      "height": 19,
+      "hotspot_x": 0,
+      "hotspot_y": 0
+    }
+  ]
+}

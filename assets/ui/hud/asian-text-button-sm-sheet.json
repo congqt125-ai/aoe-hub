@@ -1,0 +1,30 @@
+{
+  "id": 50720,
+  "drs": "interfac",
+  "num_frames": 2,
+  "palette_id": 50500,
+  "sheet_width": 671,
+  "sheet_height": 242,
+  "sheet_png": "interfac/50720_sheet.png",
+  "frames_dir": "interfac/50720_frames",
+  "frames": [
+    {
+      "frame": 0,
+      "x": 0,
+      "y": 0,
+      "width": 595,
+      "height": 242,
+      "hotspot_x": 0,
+      "hotspot_y": 0
+    },
+    {
+      "frame": 1,
+      "x": 597,
+      "y": 0,
+      "width": 72,
+      "height": 20,
+      "hotspot_x": 0,
+      "hotspot_y": 0
+    }
+  ]
+}

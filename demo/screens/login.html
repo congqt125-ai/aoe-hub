@@ -1,0 +1,265 @@
+<!doctype html>
+<html lang="vi" data-theme="hub-temple" data-dialog-theme="dlg6_3">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Đăng nhập — AoE Hub</title>
+<!-- Bản mẫu HTML/CSS của màn Đăng nhập (docs/wireframes.md §1). Chỉ dùng token từ tokens/aoe-theme.css. -->
+<link rel="stylesheet" href="../../tokens/aoe-theme.css">
+<style>
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    font: 14px/1.45 var(--aoe-font-body);
+    color: var(--aoe-text);
+    display: flex; flex-direction: column; height: 100vh;
+  }
+  a, button, label, input[type=checkbox] { cursor: url("../../assets/ui/cursor/pointer.cur") 6 0, pointer; }
+  input[type=text], input[type=password] { cursor: text; }
+
+  .skip { position: absolute; left: -9999px; }
+  .skip:focus { left: 16px; top: 16px; z-index: 10; padding: 6px 12px; background: #000; color: var(--aoe-state); }
+
+  /* ---- Banner (mất kết nối) ---- */
+  .banner { display: none; align-items: center; gap: 10px; padding: 8px 16px; font-weight: 700;
+            background: var(--aoe-warning); color: var(--aoe-on-warning); }
+  .banner button { margin-left: auto; font: inherit; background: rgba(0,0,0,.15); color: inherit; border: 0; padding: 3px 10px; }
+  [data-state="offline"] .banner { display: flex; }
+
+  /* ---- Layout: dialog sits below the top of the background (temple pediment of hub-temple) ---- */
+  main { flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; align-items: center; padding: 0 16px 16px; }
+  /* Keeps the top of the picture visible; shrinks first when the dialog grows (error state, small windows). */
+  .logo-space { flex: 0 1 36vh; min-height: 72px; }
+
+  /* ---- Dialog ---- */
+  .dialog { width: min(420px, 100%); padding: 22px 26px 24px; }
+  .dialog h1 { margin: 0 0 4px; text-align: center; font: 600 24px/1.2 var(--aoe-font-heading); letter-spacing: .02em; }
+  .dialog .lead { margin: 0 0 18px; text-align: center; font-size: 13px; }
+  .field { margin-bottom: 14px; }
+  .field label { display: block; margin-bottom: 4px; font: 600 14px var(--aoe-font-heading); }
+  .control { position: relative; display: flex; }
+  .control input {
+    flex: 1; min-width: 0; height: 36px; padding: 0 12px; border: 0; outline: 0;
+    font: 15px var(--aoe-font-body); color: var(--dlg-state); text-shadow: none;
+    background: rgba(0, 0, 0, .7);
+  }
+  .control input::placeholder { color: rgba(255,255,255,.55); }
+  .control:focus-within { outline: 1px dashed var(--dlg-focus); outline-offset: 2px; }
+  .control.has-error input { box-shadow: inset 0 0 0 2px var(--aoe-danger), inset 3px 3px 0 #000; }
+  .reveal { position: absolute; right: 4px; top: 4px; height: 28px; padding: 0 8px; border: 0;
+            font: 12px var(--aoe-font-body); color: var(--dlg-state); background: transparent; }
+  .reveal:hover { color: var(--dlg-focus); }
+  .reveal:focus-visible { outline: 1px dashed var(--dlg-focus); }
+  .hint-error { display: none; margin-top: 6px; padding: 4px 8px; font-size: 13px; color: var(--aoe-danger); text-shadow: none; }
+  .has-error + .hint-error { display: block; }
+
+  .row { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 4px 0 18px; flex-wrap: wrap; }
+  /* Checkbox: game control sprite (normal / pressed frames), no outline. Wood (default) uses the sandstone sprite, see setSkin. */
+  .check { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; }
+  .check input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+  .check .box { width: 26px; height: 26px; flex: none; background: var(--chk-off, url("../../assets/ui/button/dlg6_0-checkbox-off-normal.png")) center / 100% 100%; }
+  .check input:checked + .box { background-image: var(--chk-on, url("../../assets/ui/button/dlg6_0-checkbox-on-normal.png")); }
+  .check:active .box { background-image: var(--chk-off-p, url("../../assets/ui/button/dlg6_0-checkbox-off-pressed.png")); }
+  .check:active input:checked + .box { background-image: var(--chk-on-p, url("../../assets/ui/button/dlg6_0-checkbox-on-pressed.png")); }
+  .check input:focus-visible + .box { outline: 1px dashed var(--dlg-focus); outline-offset: 2px; }
+  .link { color: var(--dlg-state); text-decoration: underline; text-underline-offset: 3px; }
+  .link:hover { color: var(--dlg-focus); }
+  .link:focus-visible { outline: 1px dashed var(--dlg-focus); outline-offset: 2px; }
+
+  .form-error { display: none; gap: 8px; align-items: flex-start; margin: -4px 0 16px; padding: 8px 10px; color: var(--aoe-danger); text-shadow: none; font-size: 13px; }
+  [data-state="error"] .form-error { display: flex; }
+
+  .actions { display: flex; gap: 10px; justify-content: flex-end; }
+  .btn {
+    position: relative; min-width: 120px; height: 40px; padding: 0 18px; border: 0;
+    font: 600 16px var(--aoe-font-heading); color: var(--dlg-state); text-shadow: 1px 1px 0 #000;
+    background: rgba(0, 0, 0, .45);
+    transition: color var(--aoe-motion-fast) step-end;
+  }
+  .btn.primary { background: rgba(0, 0, 0, .65); min-width: 150px; }
+  .btn:hover { color: var(--dlg-focus); }
+  .btn:active { padding-top: 2px; padding-left: 20px; }
+  .btn:focus-visible { outline: 1px dashed var(--dlg-focus); outline-offset: -7px; }
+  .btn[disabled] { color: rgba(255,255,255,.5); text-shadow: none; cursor: url("../../assets/ui/cursor/busy.cur") 13 20, wait; }
+  .spinner { display: none; width: 14px; height: 20px; margin-right: 8px; vertical-align: -4px;
+             background: url("../../assets/ui/cursor/busy.png") center / contain no-repeat; animation: flip .6s steps(1) infinite; }
+  [data-state="loading"] .spinner { display: inline-block; }
+  @keyframes flip { 50% { transform: rotate(180deg); } }
+
+  /* Kiểu trong suốt: nền nhìn xuyên qua, phủ tối 60% (đo trên scr1: chữ trắng >= 7.17:1; cần đo lại với ảnh hub-temple). */
+  .dialog.glass { background: rgba(0, 0, 0, .6); -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px); }
+  .dialog.glass .control input { background: rgba(0, 0, 0, .55); }
+
+  /* ---- Footer ---- */
+  footer { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 10px 16px;
+           font-size: 12px; color: var(--aoe-state); text-shadow: 1px 1px 0 #000; background: rgba(0,0,0,.55); }
+  .server { display: inline-flex; align-items: center; gap: 8px; }
+  .ping { display: inline-flex; align-items: flex-end; gap: 2px; height: 12px; }
+  .ping i { width: 3px; background: var(--aoe-status-online); }
+  .ping i:nth-child(1) { height: 4px; } .ping i:nth-child(2) { height: 7px; } .ping i:nth-child(3) { height: 10px; } .ping i:nth-child(4) { height: 12px; }
+  [data-state="offline"] .ping i { background: var(--aoe-status-offline); }
+  [data-state="offline"] .ping i:nth-child(n+2) { opacity: .3; }
+
+  /* ---- Review-only state switcher (not part of the design) ---- */
+  .demo { display: inline-flex; gap: 4px; align-items: center; }
+  .demo button { font: 11px var(--aoe-font-body); color: var(--aoe-state); background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.2); padding: 2px 8px; }
+  .demo button[aria-pressed="true"] { background: rgba(255,255,255,.25); }
+
+  @media (prefers-reduced-motion: reduce) { .spinner { animation: none; } .btn { transition: none; } }
+</style>
+</head>
+<body class="surface-screen-bg" data-state="idle">
+<a class="skip" href="#username">Bỏ qua tới ô đăng nhập</a>
+
+<div class="banner" role="status">
+  <span aria-hidden="true">⚠</span>
+  <span>Mất kết nối tới máy chủ — đang kết nối lại… (lần 3)</span>
+  <button type="button" id="retry">Thử ngay</button>
+</div>
+
+<main>
+  <div class="logo-space" aria-hidden="true"></div>
+
+  <form class="dialog surface-dialog tone-dialog bevel-raised" data-dialog-theme="dlg6_3" id="login" novalidate aria-labelledby="login-title">
+    <h1 id="login-title">Đăng nhập</h1>
+    <p class="lead">Vào sảnh để tìm phòng và chơi cùng bạn bè.</p>
+
+    <div class="form-error surface-well" id="form-error" role="alert">
+      <span aria-hidden="true">✕</span>
+      <span>Sai tên đăng nhập hoặc mật khẩu. Kiểm tra lại rồi thử lần nữa.</span>
+    </div>
+
+    <div class="field">
+      <label for="username">Tên đăng nhập</label>
+      <div class="control" id="username-control">
+        <input id="username" name="username" type="text" autocomplete="username" required
+               placeholder="vd: lan_hylap" aria-describedby="username-error">
+      </div>
+      <div class="hint-error surface-well" id="username-error">Nhập tên đăng nhập.</div>
+    </div>
+
+    <div class="field">
+      <label for="password">Mật khẩu</label>
+      <div class="control" id="password-control">
+        <input id="password" name="password" type="password" autocomplete="current-password" required
+               aria-describedby="password-error">
+        <button class="reveal" type="button" id="reveal" aria-pressed="false" aria-label="Hiện mật khẩu">Hiện</button>
+      </div>
+      <div class="hint-error surface-well" id="password-error">Nhập mật khẩu.</div>
+    </div>
+
+    <div class="row">
+      <label class="check"><input type="checkbox" id="remember" checked><span class="box" aria-hidden="true"></span>Ghi nhớ đăng nhập</label>
+      <a class="link" href="#" id="forgot">Quên mật khẩu?</a>
+    </div>
+
+    <div class="actions">
+      <button class="btn tone-dialog bevel-raised" type="button" id="register">Đăng ký</button>
+      <button class="btn primary tone-dialog bevel-raised" type="submit" id="submit"><span class="spinner" aria-hidden="true"></span><span id="submit-label">Đăng nhập</span></button>
+    </div>
+  </form>
+</main>
+
+<footer>
+  <span>AoE Hub · bản mẫu 0.1</span>
+  <span class="demo" aria-label="Xem trạng thái (chỉ để duyệt bản mẫu)">Xem trạng thái:
+    <button type="button" data-demo="idle" aria-pressed="true">Bình thường</button>
+    <button type="button" data-demo="error" aria-pressed="false">Lỗi</button>
+    <button type="button" data-demo="loading" aria-pressed="false">Đang đăng nhập</button>
+    <button type="button" data-demo="offline" aria-pressed="false">Mất kết nối</button>
+  </span>
+  <span class="demo" aria-label="Kiểu hộp thoại (chỉ để duyệt bản mẫu)">Hộp thoại:
+    <button type="button" data-skin="dlg6_0" aria-pressed="false">Sa thạch</button>
+    <button type="button" data-skin="dlg6_3" aria-pressed="true">Gỗ (mặc định)</button>
+    <button type="button" data-skin="glass" aria-pressed="false">Trong suốt</button>
+  </span>
+  <span class="server"><span id="server-label">Máy chủ: Châu Á · 42 ms</span><span class="ping" aria-hidden="true"><i></i><i></i><i></i><i></i></span></span>
+</footer>
+
+<script>
+  const $ = id => document.getElementById(id);
+  const body = document.body, form = $("login");
+  const fields = ["username", "password"];
+
+  function setState(state) {
+    body.dataset.state = state;
+    const busy = state === "loading", offline = state === "offline";
+    fields.forEach(f => $(f).disabled = busy);
+    $("submit").disabled = busy || offline;
+    $("submit").title = offline ? "Không có kết nối tới máy chủ" : "";
+    $("submit-label").textContent = busy ? "Đang đăng nhập…" : "Đăng nhập";
+    $("server-label").textContent = offline ? "Máy chủ: mất kết nối" : "Máy chủ: Châu Á · 42 ms";
+    document.querySelectorAll("[data-demo]").forEach(b => b.setAttribute("aria-pressed", b.dataset.demo === state));
+  }
+
+  function validate() {
+    let first = null;
+    for (const f of fields) {
+      const bad = !$(f).value.trim();
+      $(f + "-control").classList.toggle("has-error", bad);
+      $(f).setAttribute("aria-invalid", bad);
+      if (bad && !first) first = $(f);
+    }
+    if (first) first.focus();
+    return !first;
+  }
+
+  fields.forEach(f => $(f).addEventListener("input", () => {
+    $(f + "-control").classList.remove("has-error");
+    $(f).removeAttribute("aria-invalid");
+  }));
+
+  form.addEventListener("submit", e => {
+    e.preventDefault();
+    if (body.dataset.state === "offline" || !validate()) return;
+    setState("loading");
+    // Mock: "demo" / "demo" logs in, anything else is rejected.
+    setTimeout(() => {
+      if ($("username").value.trim() === "demo" && $("password").value === "demo") {
+        $("submit-label").textContent = "Đã đăng nhập ✓";
+        setTimeout(() => setState("idle"), 1200);
+      } else {
+        setState("error");
+        $("password").value = "";
+        $("password").focus();
+      }
+    }, 1100);
+  });
+
+  $("reveal").addEventListener("click", () => {
+    const show = $("password").type === "password";
+    $("password").type = show ? "text" : "password";
+    $("reveal").textContent = show ? "Ẩn" : "Hiện";
+    $("reveal").setAttribute("aria-pressed", show);
+    $("reveal").setAttribute("aria-label", show ? "Ẩn mật khẩu" : "Hiện mật khẩu");
+  });
+  $("retry").addEventListener("click", () => setState("idle"));
+  $("register").addEventListener("click", () => alert("Màn Đăng ký: chưa làm trong bản mẫu này."));
+  $("forgot").addEventListener("click", e => { e.preventDefault(); alert("Quên mật khẩu: chưa làm trong bản mẫu này."); });
+  document.querySelectorAll("[data-demo]").forEach(b => b.addEventListener("click", () => {
+    setState(b.dataset.demo);
+  }));
+  function setSkin(skin) {
+    form.classList.toggle("glass", skin === "glass");
+    // glass keeps the sandstone bevel; wood switches the whole dialog theme (texture, bevel, controls).
+    form.dataset.dialogTheme = skin === "dlg6_3" ? "dlg6_3" : "dlg6_0";
+    // The wood theme's own checkbox blends into the wood (1.55:1); use the sandstone sprite of dlg6_0 (2.93:1).
+    const CHECKBOX_SPRITE = { dlg6_3: "dlg6_0" };
+    const ctl = CHECKBOX_SPRITE[form.dataset.dialogTheme] || form.dataset.dialogTheme;
+    document.documentElement.style.setProperty("--chk-off", `url("../../assets/ui/button/${ctl}-checkbox-off-normal.png")`);
+    document.documentElement.style.setProperty("--chk-on", `url("../../assets/ui/button/${ctl}-checkbox-on-normal.png")`);
+    document.documentElement.style.setProperty("--chk-off-p", `url("../../assets/ui/button/${ctl}-checkbox-off-pressed.png")`);
+    document.documentElement.style.setProperty("--chk-on-p", `url("../../assets/ui/button/${ctl}-checkbox-on-pressed.png")`);
+    document.querySelectorAll("[data-skin]").forEach(b => b.setAttribute("aria-pressed", b.dataset.skin === skin));
+    try { localStorage.setItem("aoe-login-skin", skin); } catch {}
+  }
+  document.querySelectorAll("[data-skin]").forEach(b => b.addEventListener("click", () => setSkin(b.dataset.skin)));
+  let savedSkin = "dlg6_3";
+  try { savedSkin = new URLSearchParams(location.search).get("skin") || localStorage.getItem("aoe-login-skin") || "dlg6_3"; } catch {}
+  setSkin(savedSkin);
+  $("username").focus();
+</script>
+<!-- Review-only: sliders for background / dialog treatment (Alt+T). -->
+<script src="../shared/tuner.js"></script>
+</body>
+</html>

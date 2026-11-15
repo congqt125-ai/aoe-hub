@@ -1,0 +1,536 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AoE Design Tokens</title>
+<style>
+@font-face { font-family: "Spectral SC"; font-weight: 400; src: url("../../assets/ui/font/web/SpectralSC-400.ttf"); }
+@font-face { font-family: "Spectral SC"; font-weight: 600; src: url("../../assets/ui/font/web/SpectralSC-600.ttf"); }
+@font-face { font-family: "Spectral SC"; font-weight: 700; src: url("../../assets/ui/font/web/SpectralSC-700.ttf"); }
+@font-face { font-family: "Arimo"; font-weight: 400; src: url("../../assets/ui/font/web/Arimo-400.ttf"); }
+@font-face { font-family: "Arimo"; font-weight: 700; src: url("../../assets/ui/font/web/Arimo-700.ttf"); }
+:root { color-scheme: dark; }
+body { margin:0; padding:16px; background:#14110d; color:#d9d0b0; font:14px/1.4 Arimo, Arial, sans-serif; }
+h1,h2 { font-family:"Spectral SC", serif; font-weight:normal; }
+.grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(360px,1fr)); gap:16px; }
+.card { background:#1f1a14; padding:10px; }
+.card header { display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-bottom:8px; }
+.muted { color:#8f8670; font-size:12px; }
+.badge { margin-left:auto; font-size:12px; padding:1px 6px; }
+.badge.ok { background:#0b4d1f; } .badge.bad { background:#6b1010; }
+.stage { background-size:cover; background-position:center; padding:18px; }
+.panel { position:relative; padding:14px; background:rgba(0,0,0,var(--shade)); }
+.title { font-family:"Spectral SC", serif; font-weight:600; font-size:18px; margin-bottom:10px; }
+.row { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px; }
+button { font:inherit; padding:7px 14px; background:transparent; border:0; cursor:pointer; }
+.input { padding:7px 10px; background:rgba(0,0,0,.35); }
+.swatches { display:flex; gap:4px; align-items:center; flex-wrap:wrap; margin-top:8px; }
+i { display:inline-block; width:18px; height:18px; vertical-align:middle; }
+.hud-top { height:20px; background-repeat:no-repeat; background-position:left top; }
+.hud-bottom { position:relative; height:126px; background-repeat:no-repeat; background-position:left top; overflow:hidden; }
+.hud-cap { position:absolute; right:0; top:0; width:280px; height:126px; background-repeat:no-repeat; background-position:right top; }
+.full { grid-template-columns:1fr; }
+.tablewrap { overflow-x:auto; }
+table.contrast { border-collapse:collapse; font-size:13px; }
+table.contrast th, table.contrast td { padding:6px 10px; border-bottom:1px solid #3b3024; text-align:left; vertical-align:middle; }
+table.contrast th { font-weight:normal; color:#d9d0b0; }
+.sample { display:inline-block; padding:4px 10px; font-weight:bold; text-shadow:1px 1px 0 #000; min-width:110px; }
+b.pass { color:#00bb37; } b.fail { color:#ff2f2f; }
+.badge-demo { display:inline-block; padding:2px 8px; margin:0 4px; font-size:12px; font-weight:bold; }
+code { font-size:11px; color:#8f8670; }
+.player { display:flex; gap:8px; align-items:center; margin:4px 0; }
+.ramp i { width:12px; }
+</style></head><body>
+<h1>AoE Design Tokens</h1>
+<p class="muted">Sinh tự động bởi tools/build_tokens.py. Viền = bevel 3px dựng bằng box-shadow từ 6 màu bevel_colors của game. Tỉ lệ tương phản đo chữ chính trên màu trung bình của nền đã phủ tối (AA cần ≥ 4.5).</p>
+
+<h2>Tương phản chữ (WCAG AA ≥ 4.5)</h2>
+<p class="muted">Đo trên màu trung bình của nền. Cột cuối: biến thể <code>onDark</code> đã sửa (sắc độ gần nhất trong cùng dải màu game). Quy tắc: trên texture hộp thoại chỉ dùng chữ trắng.</p>
+<div class="tablewrap"><table class="contrast"><thead><tr><th>Màu chữ</th><th>Nền tối scr2<br><code>#1f0f01</code></th><th>Texture dlg6_0 + phủ 45%<br><code>#745c44</code></th><th>onDark trên nền tối</th></tr></thead><tbody><tr><th>Chữ chính scr2<br><code>#d9d0b0</code></th><td><span class="sample" style="background:#1f0f01;color:#d9d0b0">Sảnh chờ 123</span> <b class="pass">12.07</b></td><td><span class="sample" style="background:#745c44;background-image:linear-gradient(rgba(0,0,0,0.45),rgba(0,0,0,0.45)),url('../../raw/interfac/50210.png');color:#d9d0b0">Sảnh chờ 123</span> <b class="fail">4.05</b></td><td class="muted">—</td></tr><tr><th>Chữ trắng (text dialog / state)<br><code>#ffffff</code></th><td><span class="sample" style="background:#1f0f01;color:#ffffff">Sảnh chờ 123</span> <b class="pass">18.63</b></td><td><span class="sample" style="background:#745c44;background-image:linear-gradient(rgba(0,0,0,0.45),rgba(0,0,0,0.45)),url('../../raw/interfac/50210.png');color:#ffffff">Sảnh chờ 123</span> <b class="pass">6.26</b></td><td class="muted">—</td></tr><tr><th>Focus<br><code>#cacf01</code></th><td><span class="sample" style="background:#1f0f01;color:#cacf01">Sảnh chờ 123</span> <b class="pass">11.04</b></td><td><span class="sample" style="background:#745c44;background-image:linear-gradient(rgba(0,0,0,0.45),rgba(0,0,0,0.45)),url('../../raw/interfac/50210.png');color:#cacf01">Sảnh chờ 123</span> <b class="fail">3.70</b></td><td class="muted">—</td></tr><tr><th>success<br><code>#00bb37</code></th><td><span class="sample" style="background:#1f0f01;color:#00bb37">Sảnh chờ 123</span> <b class="pass">7.24</b></td><td><span class="sample" style="background:#745c44;background-image:linear-gradient(rgba(0,0,0,0.45),rgba(0,0,0,0.45)),url('../../raw/interfac/50210.png');color:#00bb37">Sảnh chờ 123</span> <b class="fail">2.43</b></td><td class="muted">— không cần</td></tr><tr><th>warning<br><code>#ffb32b</code></th><td><span class="sample" style="background:#1f0f01;color:#ffb32b">Sảnh chờ 123</span> <b class="pass">10.41</b></td><td><span class="sample" style="background:#745c44;background-image:linear-gradient(rgba(0,0,0,0.45),rgba(0,0,0,0.45)),url('../../raw/interfac/50210.png');color:#ffb32b">Sảnh chờ 123</span> <b class="fail">3.50</b></td><td class="muted">— không cần</td></tr><tr><th>danger<br><code>#ff2f2f</code></th><td><span class="sample" style="background:#1f0f01;color:#ff2f2f">Sảnh chờ 123</span> <b class="pass">5.06</b></td><td><span class="sample" style="background:#745c44;background-image:linear-gradient(rgba(0,0,0,0.45),rgba(0,0,0,0.45)),url('../../raw/interfac/50210.png');color:#ff2f2f">Sảnh chờ 123</span> <b class="fail">1.70</b></td><td class="muted">— không cần</td></tr><tr><th>info<br><code>#577bb3</code> → <code>#739bc7</code></th><td><span class="sample" style="background:#1f0f01;color:#577bb3">Sảnh chờ 123</span> <b class="fail">4.34</b></td><td><span class="sample" style="background:#745c44;background-image:linear-gradient(rgba(0,0,0,0.45),rgba(0,0,0,0.45)),url('../../raw/interfac/50210.png');color:#577bb3">Sảnh chờ 123</span> <b class="fail">1.46</b></td><td><span class="sample" style="background:#1f0f01;color:#739bc7">Sảnh chờ 123</span> <b class="pass">6.43</b></td></tr><tr><th>player-1 blue<br><code>#577bb3</code> → <code>#739bc7</code></th><td><span class="sample" style="background:#1f0f01;color:#577bb3">Sảnh chờ 123</span> <b class="fail">4.34</b></td><td><span class="sample" style="background:#745c44;background-image:linear-gradient(rgba(0,0,0,0.45),rgba(0,0,0,0.45)),url('../../raw/interfac/50210.png');color:#577bb3">Sảnh chờ 123</span> <b class="fail">1.46</b></td><td><span class="sample" style="background:#1f0f01;color:#739bc7">Sảnh chờ 123</span> <b class="pass">6.43</b></td></tr><tr><th>player-2 red<br><code>#ff2f2f</code></th><td><span class="sample" style="background:#1f0f01;color:#ff2f2f">Sảnh chờ 123</span> <b class="pass">5.06</b></td><td><span class="sample" style="background:#745c44;background-image:linear-gradient(rgba(0,0,0,0.45),rgba(0,0,0,0.45)),url('../../raw/interfac/50210.png');color:#ff2f2f">Sảnh chờ 123</span> <b class="fail">1.70</b></td><td class="muted">— không cần</td></tr><tr><th>player-3 yellow<br><code>#dfcf0f</code></th><td><span class="sample" style="background:#1f0f01;color:#dfcf0f">Sảnh chờ 123</span> <b class="pass">11.60</b></td><td><span class="sample" style="background:#745c44;background-image:linear-gradient(rgba(0,0,0,0.45),rgba(0,0,0,0.45)),url('../../raw/interfac/50210.png');color:#dfcf0f">Sảnh chờ 123</span> <b class="fail">3.89</b></td><td class="muted">— không cần</td></tr><tr><th>player-4 brown<br><code>#a3734f</code></th><td><span class="sample" style="background:#1f0f01;color:#a3734f">Sảnh chờ 123</span> <b class="pass">4.55</b></td><td><span class="sample" style="background:#745c44;background-image:linear-gradient(rgba(0,0,0,0.45),rgba(0,0,0,0.45)),url('../../raw/interfac/50210.png');color:#a3734f">Sảnh chờ 123</span> <b class="fail">1.53</b></td><td class="muted">— không cần</td></tr><tr><th>player-5 orange<br><code>#f3770f</code></th><td><span class="sample" style="background:#1f0f01;color:#f3770f">Sảnh chờ 123</span> <b class="pass">6.62</b></td><td><span class="sample" style="background:#745c44;background-image:linear-gradient(rgba(0,0,0,0.45),rgba(0,0,0,0.45)),url('../../raw/interfac/50210.png');color:#f3770f">Sảnh chờ 123</span> <b class="fail">2.22</b></td><td class="muted">— không cần</td></tr><tr><th>player-6 green<br><code>#637b2f</code> → <code>#7f8b37</code></th><td><span class="sample" style="background:#1f0f01;color:#637b2f">Sảnh chờ 123</span> <b class="fail">3.91</b></td><td><span class="sample" style="background:#745c44;background-image:linear-gradient(rgba(0,0,0,0.45),rgba(0,0,0,0.45)),url('../../raw/interfac/50210.png');color:#637b2f">Sảnh chờ 123</span> <b class="fail">1.31</b></td><td><span class="sample" style="background:#1f0f01;color:#7f8b37">Sảnh chờ 123</span> <b class="pass">5.01</b></td></tr><tr><th>player-7 grey<br><code>#b3b3b3</code></th><td><span class="sample" style="background:#1f0f01;color:#b3b3b3">Sảnh chờ 123</span> <b class="pass">8.89</b></td><td><span class="sample" style="background:#745c44;background-image:linear-gradient(rgba(0,0,0,0.45),rgba(0,0,0,0.45)),url('../../raw/interfac/50210.png');color:#b3b3b3">Sảnh chờ 123</span> <b class="fail">2.98</b></td><td class="muted">— không cần</td></tr><tr><th>player-8 cyan<br><code>#00ab93</code></th><td><span class="sample" style="background:#1f0f01;color:#00ab93">Sảnh chờ 123</span> <b class="pass">6.43</b></td><td><span class="sample" style="background:#745c44;background-image:linear-gradient(rgba(0,0,0,0.45),rgba(0,0,0,0.45)),url('../../raw/interfac/50210.png');color:#00ab93">Sảnh chờ 123</span> <b class="fail">2.16</b></td><td class="muted">— không cần</td></tr></tbody></table></div>
+<p>Chữ trên badge (<code>onSemantic</code>): <span class="badge-demo" style="background:#00bb37;color:#000000">success 8.16</span><span class="badge-demo" style="background:#ffb32b;color:#000000">warning 11.73</span><span class="badge-demo" style="background:#ff2f2f;color:#000000">danger 5.70</span><span class="badge-demo" style="background:#577bb3;color:#000000">info 4.89</span></p>
+<h2>Theme màn hình</h2><div class="grid">
+<section class="card">
+  <header><b>scr1</b> <span class="muted">desc 50051 · pal 50501 · shade 44%</span>
+    <span class="badge ok">chữ/nền 9.66:1</span></header>
+  <div class="stage" style="background-image:url('../../assets/ui/bg/scr1.webp');background-color:#000000">
+    <div class="panel" style="--shade:0.44;box-shadow:inset 1px 1px 0 #ffde7b, inset -1px -1px 0 #423110, inset 2px 2px 0 #f4bd63, inset -2px -2px 0 #945229, inset 3px 3px 0 #d38939, inset -3px -3px 0 #d38939">
+      <div class="title" style="color:#d9d0b0;text-shadow:1px 1px 0 #000000">Sảnh chờ — Lobby</div>
+      <div class="row">
+        <button style="box-shadow:inset 1px 1px 0 #ffde7b, inset -1px -1px 0 #423110, inset 2px 2px 0 #f4bd63, inset -2px -2px 0 #945229, inset 3px 3px 0 #d38939, inset -3px -3px 0 #d38939;color:#d9d0b0;text-shadow:1px 1px 0 #000000">Vào phòng</button>
+        <button style="box-shadow:inset 1px 1px 0 #ffde7b, inset -1px -1px 0 #423110, inset 2px 2px 0 #f4bd63, inset -2px -2px 0 #945229, inset 3px 3px 0 #d38939, inset -3px -3px 0 #d38939;color:#cacf01;text-shadow:1px 1px 0 #000000">Hover</button>
+        <button style="box-shadow:inset 1px 1px 0 #423110, inset -1px -1px 0 #ffde7b, inset 2px 2px 0 #945229, inset -2px -2px 0 #f4bd63, inset 3px 3px 0 #d38939, inset -3px -3px 0 #d38939;color:#ffffff;text-shadow:1px 1px 0 #000000">Đang nhấn</button>
+      </div>
+      <div class="input" style="box-shadow:inset 1px 1px 0 #423110, inset -1px -1px 0 #ffde7b, inset 2px 2px 0 #945229, inset -2px -2px 0 #f4bd63, inset 3px 3px 0 #d38939, inset -3px -3px 0 #d38939;color:#d9d0b0">Ô nhập (viền lõm)</div>
+    </div>
+  </div>
+  <div class="swatches"><i title="bevel[0] #ffde7b" style="background:#ffde7b"></i><i title="bevel[1] #f4bd63" style="background:#f4bd63"></i><i title="bevel[2] #d38939" style="background:#d38939"></i><i title="bevel[3] #d38939" style="background:#d38939"></i><i title="bevel[4] #945229" style="background:#945229"></i><i title="bevel[5] #423110" style="background:#423110"></i>
+    <span class="muted">text <i style="background:#d9d0b0"></i> focus <i style="background:#cacf01"></i> state <i style="background:#ffffff"></i></span></div>
+</section>
+<section class="card">
+  <header><b>scr2</b> <span class="muted">desc 50052 · pal 50502 · shade 51%</span>
+    <span class="badge ok">chữ/nền 12.07:1</span></header>
+  <div class="stage" style="background-image:url('../../assets/ui/bg/scr2.webp');background-color:#00ff40">
+    <div class="panel" style="--shade:0.51;box-shadow:inset 1px 1px 0 #733b00, inset -1px -1px 0 #2c1806, inset 2px 2px 0 #3b1a03, inset -2px -2px 0 #3b0d02, inset 3px 3px 0 #220a01, inset -3px -3px 0 #130500">
+      <div class="title" style="color:#d9d0b0;text-shadow:1px 1px 0 #000000">Sảnh chờ — Lobby</div>
+      <div class="row">
+        <button style="box-shadow:inset 1px 1px 0 #733b00, inset -1px -1px 0 #2c1806, inset 2px 2px 0 #3b1a03, inset -2px -2px 0 #3b0d02, inset 3px 3px 0 #220a01, inset -3px -3px 0 #130500;color:#d9d0b0;text-shadow:1px 1px 0 #000000">Vào phòng</button>
+        <button style="box-shadow:inset 1px 1px 0 #733b00, inset -1px -1px 0 #2c1806, inset 2px 2px 0 #3b1a03, inset -2px -2px 0 #3b0d02, inset 3px 3px 0 #220a01, inset -3px -3px 0 #130500;color:#cacf01;text-shadow:1px 1px 0 #000000">Hover</button>
+        <button style="box-shadow:inset 1px 1px 0 #2c1806, inset -1px -1px 0 #733b00, inset 2px 2px 0 #3b0d02, inset -2px -2px 0 #3b1a03, inset 3px 3px 0 #130500, inset -3px -3px 0 #220a01;color:#ffffff;text-shadow:1px 1px 0 #000000">Đang nhấn</button>
+      </div>
+      <div class="input" style="box-shadow:inset 1px 1px 0 #2c1806, inset -1px -1px 0 #733b00, inset 2px 2px 0 #3b0d02, inset -2px -2px 0 #3b1a03, inset 3px 3px 0 #130500, inset -3px -3px 0 #220a01;color:#d9d0b0">Ô nhập (viền lõm)</div>
+    </div>
+  </div>
+  <div class="swatches"><i title="bevel[0] #733b00" style="background:#733b00"></i><i title="bevel[1] #3b1a03" style="background:#3b1a03"></i><i title="bevel[2] #220a01" style="background:#220a01"></i><i title="bevel[3] #130500" style="background:#130500"></i><i title="bevel[4] #3b0d02" style="background:#3b0d02"></i><i title="bevel[5] #2c1806" style="background:#2c1806"></i>
+    <span class="muted">text <i style="background:#d9d0b0"></i> focus <i style="background:#cacf01"></i> state <i style="background:#ffffff"></i></span></div>
+</section>
+<section class="card">
+  <header><b>scr3</b> <span class="muted">desc 50053 · pal 50503 · shade 44%</span>
+    <span class="badge ok">chữ/nền 12.54:1</span></header>
+  <div class="stage" style="background-image:url('../../assets/ui/bg/scr3.webp');background-color:#000000">
+    <div class="panel" style="--shade:0.44;box-shadow:inset 1px 1px 0 #e3d09f, inset -1px -1px 0 #432d22, inset 2px 2px 0 #c59d81, inset -2px -2px 0 #685539, inset 3px 3px 0 #b6825d, inset -3px -3px 0 #89624a">
+      <div class="title" style="color:#f5f3eb;text-shadow:1px 1px 0 #000000">Sảnh chờ — Lobby</div>
+      <div class="row">
+        <button style="box-shadow:inset 1px 1px 0 #e3d09f, inset -1px -1px 0 #432d22, inset 2px 2px 0 #c59d81, inset -2px -2px 0 #685539, inset 3px 3px 0 #b6825d, inset -3px -3px 0 #89624a;color:#f5f3eb;text-shadow:1px 1px 0 #000000">Vào phòng</button>
+        <button style="box-shadow:inset 1px 1px 0 #e3d09f, inset -1px -1px 0 #432d22, inset 2px 2px 0 #c59d81, inset -2px -2px 0 #685539, inset 3px 3px 0 #b6825d, inset -3px -3px 0 #89624a;color:#cacf01;text-shadow:1px 1px 0 #000000">Hover</button>
+        <button style="box-shadow:inset 1px 1px 0 #432d22, inset -1px -1px 0 #e3d09f, inset 2px 2px 0 #685539, inset -2px -2px 0 #c59d81, inset 3px 3px 0 #89624a, inset -3px -3px 0 #b6825d;color:#ffffff;text-shadow:1px 1px 0 #000000">Đang nhấn</button>
+      </div>
+      <div class="input" style="box-shadow:inset 1px 1px 0 #432d22, inset -1px -1px 0 #e3d09f, inset 2px 2px 0 #685539, inset -2px -2px 0 #c59d81, inset 3px 3px 0 #89624a, inset -3px -3px 0 #b6825d;color:#f5f3eb">Ô nhập (viền lõm)</div>
+    </div>
+  </div>
+  <div class="swatches"><i title="bevel[0] #e3d09f" style="background:#e3d09f"></i><i title="bevel[1] #c59d81" style="background:#c59d81"></i><i title="bevel[2] #b6825d" style="background:#b6825d"></i><i title="bevel[3] #89624a" style="background:#89624a"></i><i title="bevel[4] #685539" style="background:#685539"></i><i title="bevel[5] #432d22" style="background:#432d22"></i>
+    <span class="muted">text <i style="background:#f5f3eb"></i> focus <i style="background:#cacf01"></i> state <i style="background:#ffffff"></i></span></div>
+</section>
+<section class="card">
+  <header><b>scr4</b> <span class="muted">desc 50054 · pal 50504 · shade 39%</span>
+    <span class="badge ok">chữ/nền 15.02:1</span></header>
+  <div class="stage" style="background-image:url('../../assets/ui/bg/scr4.webp');background-color:#00ff40">
+    <div class="panel" style="--shade:0.39;box-shadow:inset 1px 1px 0 #a27635, inset -1px -1px 0 #0c0a09, inset 2px 2px 0 #634821, inset -2px -2px 0 #2d210f, inset 3px 3px 0 #493418, inset -3px -3px 0 #201a10">
+      <div class="title" style="color:#ffffff;text-shadow:1px 1px 0 #000000">Sảnh chờ — Lobby</div>
+      <div class="row">
+        <button style="box-shadow:inset 1px 1px 0 #a27635, inset -1px -1px 0 #0c0a09, inset 2px 2px 0 #634821, inset -2px -2px 0 #2d210f, inset 3px 3px 0 #493418, inset -3px -3px 0 #201a10;color:#ffffff;text-shadow:1px 1px 0 #000000">Vào phòng</button>
+        <button style="box-shadow:inset 1px 1px 0 #a27635, inset -1px -1px 0 #0c0a09, inset 2px 2px 0 #634821, inset -2px -2px 0 #2d210f, inset 3px 3px 0 #493418, inset -3px -3px 0 #201a10;color:#cacf01;text-shadow:1px 1px 0 #000000">Hover</button>
+        <button style="box-shadow:inset 1px 1px 0 #0c0a09, inset -1px -1px 0 #a27635, inset 2px 2px 0 #2d210f, inset -2px -2px 0 #634821, inset 3px 3px 0 #201a10, inset -3px -3px 0 #493418;color:#ffffff;text-shadow:1px 1px 0 #000000">Đang nhấn</button>
+      </div>
+      <div class="input" style="box-shadow:inset 1px 1px 0 #0c0a09, inset -1px -1px 0 #a27635, inset 2px 2px 0 #2d210f, inset -2px -2px 0 #634821, inset 3px 3px 0 #201a10, inset -3px -3px 0 #493418;color:#ffffff">Ô nhập (viền lõm)</div>
+    </div>
+  </div>
+  <div class="swatches"><i title="bevel[0] #a27635" style="background:#a27635"></i><i title="bevel[1] #634821" style="background:#634821"></i><i title="bevel[2] #493418" style="background:#493418"></i><i title="bevel[3] #201a10" style="background:#201a10"></i><i title="bevel[4] #2d210f" style="background:#2d210f"></i><i title="bevel[5] #0c0a09" style="background:#0c0a09"></i>
+    <span class="muted">text <i style="background:#ffffff"></i> focus <i style="background:#cacf01"></i> state <i style="background:#ffffff"></i></span></div>
+</section>
+<section class="card">
+  <header><b>scr5</b> <span class="muted">desc 50055 · pal 50500 · shade 5%</span>
+    <span class="badge ok">chữ/nền 9.01:1</span></header>
+  <div class="stage" style="background-image:url('../../assets/ui/bg/scr5.webp');background-color:#000000">
+    <div class="panel" style="--shade:0.05;box-shadow:inset 1px 1px 0 #e7cfaf, inset -1px -1px 0 #8b5b37, inset 2px 2px 0 #d7b78f, inset -2px -2px 0 #976f4f, inset 3px 3px 0 #d3ab7f, inset -3px -3px 0 #af835f">
+      <div class="title" style="color:#000005;text-shadow:1px 1px 0 #e7cfaf">Sảnh chờ — Lobby</div>
+      <div class="row">
+        <button style="box-shadow:inset 1px 1px 0 #e7cfaf, inset -1px -1px 0 #8b5b37, inset 2px 2px 0 #d7b78f, inset -2px -2px 0 #976f4f, inset 3px 3px 0 #d3ab7f, inset -3px -3px 0 #af835f;color:#000005;text-shadow:1px 1px 0 #e7cfaf">Vào phòng</button>
+        <button style="box-shadow:inset 1px 1px 0 #e7cfaf, inset -1px -1px 0 #8b5b37, inset 2px 2px 0 #d7b78f, inset -2px -2px 0 #976f4f, inset 3px 3px 0 #d3ab7f, inset -3px -3px 0 #af835f;color:#ffff27;text-shadow:1px 1px 0 #e7cfaf">Hover</button>
+        <button style="box-shadow:inset 1px 1px 0 #8b5b37, inset -1px -1px 0 #e7cfaf, inset 2px 2px 0 #976f4f, inset -2px -2px 0 #d7b78f, inset 3px 3px 0 #af835f, inset -3px -3px 0 #d3ab7f;color:#ffffff;text-shadow:1px 1px 0 #e7cfaf">Đang nhấn</button>
+      </div>
+      <div class="input" style="box-shadow:inset 1px 1px 0 #8b5b37, inset -1px -1px 0 #e7cfaf, inset 2px 2px 0 #976f4f, inset -2px -2px 0 #d7b78f, inset 3px 3px 0 #af835f, inset -3px -3px 0 #d3ab7f;color:#000005">Ô nhập (viền lõm)</div>
+    </div>
+  </div>
+  <div class="swatches"><i title="bevel[0] #e7cfaf" style="background:#e7cfaf"></i><i title="bevel[1] #d7b78f" style="background:#d7b78f"></i><i title="bevel[2] #d3ab7f" style="background:#d3ab7f"></i><i title="bevel[3] #af835f" style="background:#af835f"></i><i title="bevel[4] #976f4f" style="background:#976f4f"></i><i title="bevel[5] #8b5b37" style="background:#8b5b37"></i>
+    <span class="muted">text <i style="background:#000005"></i> focus <i style="background:#ffff27"></i> state <i style="background:#ffffff"></i></span></div>
+</section>
+<section class="card">
+  <header><b>scr7</b> <span class="muted">desc 50057 · pal 50505 · shade 49%</span>
+    <span class="badge ok">chữ/nền 10.04:1</span></header>
+  <div class="stage" style="background-image:url('../../assets/ui/bg/scr7.webp');background-color:#00ff40">
+    <div class="panel" style="--shade:0.49;box-shadow:inset 1px 1px 0 #7b6352, inset -1px -1px 0 #212121, inset 2px 2px 0 #725228, inset -2px -2px 0 #3b160e, inset 3px 3px 0 #5a5242, inset -3px -3px 0 #4e4631">
+      <div class="title" style="color:#d9d0b0;text-shadow:1px 1px 0 #000000">Sảnh chờ — Lobby</div>
+      <div class="row">
+        <button style="box-shadow:inset 1px 1px 0 #7b6352, inset -1px -1px 0 #212121, inset 2px 2px 0 #725228, inset -2px -2px 0 #3b160e, inset 3px 3px 0 #5a5242, inset -3px -3px 0 #4e4631;color:#d9d0b0;text-shadow:1px 1px 0 #000000">Vào phòng</button>
+        <button style="box-shadow:inset 1px 1px 0 #7b6352, inset -1px -1px 0 #212121, inset 2px 2px 0 #725228, inset -2px -2px 0 #3b160e, inset 3px 3px 0 #5a5242, inset -3px -3px 0 #4e4631;color:#cacf01;text-shadow:1px 1px 0 #000000">Hover</button>
+        <button style="box-shadow:inset 1px 1px 0 #212121, inset -1px -1px 0 #7b6352, inset 2px 2px 0 #3b160e, inset -2px -2px 0 #725228, inset 3px 3px 0 #4e4631, inset -3px -3px 0 #5a5242;color:#d9d0b0;text-shadow:1px 1px 0 #000000">Đang nhấn</button>
+      </div>
+      <div class="input" style="box-shadow:inset 1px 1px 0 #212121, inset -1px -1px 0 #7b6352, inset 2px 2px 0 #3b160e, inset -2px -2px 0 #725228, inset 3px 3px 0 #4e4631, inset -3px -3px 0 #5a5242;color:#d9d0b0">Ô nhập (viền lõm)</div>
+    </div>
+  </div>
+  <div class="swatches"><i title="bevel[0] #7b6352" style="background:#7b6352"></i><i title="bevel[1] #725228" style="background:#725228"></i><i title="bevel[2] #5a5242" style="background:#5a5242"></i><i title="bevel[3] #4e4631" style="background:#4e4631"></i><i title="bevel[4] #3b160e" style="background:#3b160e"></i><i title="bevel[5] #212121" style="background:#212121"></i>
+    <span class="muted">text <i style="background:#d9d0b0"></i> focus <i style="background:#cacf01"></i> state <i style="background:#d9d0b0"></i></span></div>
+</section>
+<section class="card">
+  <header><b>scr8</b> <span class="muted">desc 50058 · pal 50506 · shade 54%</span>
+    <span class="badge ok">chữ/nền 11.48:1</span></header>
+  <div class="stage" style="background-image:url('../../assets/ui/bg/scr8.webp');background-color:#00ff40">
+    <div class="panel" style="--shade:0.54;box-shadow:inset 1px 1px 0 #8c6535, inset -1px -1px 0 #392100, inset 2px 2px 0 #7b4418, inset -2px -2px 0 #632900, inset 3px 3px 0 #633900, inset -3px -3px 0 #633900">
+      <div class="title" style="color:#d9d0b0;text-shadow:1px 1px 0 #000000">Sảnh chờ — Lobby</div>
+      <div class="row">
+        <button style="box-shadow:inset 1px 1px 0 #8c6535, inset -1px -1px 0 #392100, inset 2px 2px 0 #7b4418, inset -2px -2px 0 #632900, inset 3px 3px 0 #633900, inset -3px -3px 0 #633900;color:#d9d0b0;text-shadow:1px 1px 0 #000000">Vào phòng</button>
+        <button style="box-shadow:inset 1px 1px 0 #8c6535, inset -1px -1px 0 #392100, inset 2px 2px 0 #7b4418, inset -2px -2px 0 #632900, inset 3px 3px 0 #633900, inset -3px -3px 0 #633900;color:#cacf01;text-shadow:1px 1px 0 #000000">Hover</button>
+        <button style="box-shadow:inset 1px 1px 0 #392100, inset -1px -1px 0 #8c6535, inset 2px 2px 0 #632900, inset -2px -2px 0 #7b4418, inset 3px 3px 0 #633900, inset -3px -3px 0 #633900;color:#ffffff;text-shadow:1px 1px 0 #000000">Đang nhấn</button>
+      </div>
+      <div class="input" style="box-shadow:inset 1px 1px 0 #392100, inset -1px -1px 0 #8c6535, inset 2px 2px 0 #632900, inset -2px -2px 0 #7b4418, inset 3px 3px 0 #633900, inset -3px -3px 0 #633900;color:#d9d0b0">Ô nhập (viền lõm)</div>
+    </div>
+  </div>
+  <div class="swatches"><i title="bevel[0] #8c6535" style="background:#8c6535"></i><i title="bevel[1] #7b4418" style="background:#7b4418"></i><i title="bevel[2] #633900" style="background:#633900"></i><i title="bevel[3] #633900" style="background:#633900"></i><i title="bevel[4] #632900" style="background:#632900"></i><i title="bevel[5] #392100" style="background:#392100"></i>
+    <span class="muted">text <i style="background:#d9d0b0"></i> focus <i style="background:#cacf01"></i> state <i style="background:#ffffff"></i></span></div>
+</section>
+<section class="card">
+  <header><b>scr9</b> <span class="muted">desc 50060 · pal 50507 · shade 54%</span>
+    <span class="badge ok">chữ/nền 15.55:1</span></header>
+  <div class="stage" style="background-image:url('../../assets/ui/bg/scr9.webp');background-color:#000000">
+    <div class="panel" style="--shade:0.54;box-shadow:inset 1px 1px 0 #e4d4b0, inset -1px -1px 0 #533411, inset 2px 2px 0 #b69f64, inset -2px -2px 0 #734e2d, inset 3px 3px 0 #af8750, inset -3px -3px 0 #886241">
+      <div class="title" style="color:#f5f3eb;text-shadow:1px 1px 0 #000000">Sảnh chờ — Lobby</div>
+      <div class="row">
+        <button style="box-shadow:inset 1px 1px 0 #e4d4b0, inset -1px -1px 0 #533411, inset 2px 2px 0 #b69f64, inset -2px -2px 0 #734e2d, inset 3px 3px 0 #af8750, inset -3px -3px 0 #886241;color:#f5f3eb;text-shadow:1px 1px 0 #000000">Vào phòng</button>
+        <button style="box-shadow:inset 1px 1px 0 #e4d4b0, inset -1px -1px 0 #533411, inset 2px 2px 0 #b69f64, inset -2px -2px 0 #734e2d, inset 3px 3px 0 #af8750, inset -3px -3px 0 #886241;color:#cacf01;text-shadow:1px 1px 0 #000000">Hover</button>
+        <button style="box-shadow:inset 1px 1px 0 #533411, inset -1px -1px 0 #e4d4b0, inset 2px 2px 0 #734e2d, inset -2px -2px 0 #b69f64, inset 3px 3px 0 #886241, inset -3px -3px 0 #af8750;color:#ffffff;text-shadow:1px 1px 0 #000000">Đang nhấn</button>
+      </div>
+      <div class="input" style="box-shadow:inset 1px 1px 0 #533411, inset -1px -1px 0 #e4d4b0, inset 2px 2px 0 #734e2d, inset -2px -2px 0 #b69f64, inset 3px 3px 0 #886241, inset -3px -3px 0 #af8750;color:#f5f3eb">Ô nhập (viền lõm)</div>
+    </div>
+  </div>
+  <div class="swatches"><i title="bevel[0] #e4d4b0" style="background:#e4d4b0"></i><i title="bevel[1] #b69f64" style="background:#b69f64"></i><i title="bevel[2] #af8750" style="background:#af8750"></i><i title="bevel[3] #886241" style="background:#886241"></i><i title="bevel[4] #734e2d" style="background:#734e2d"></i><i title="bevel[5] #533411" style="background:#533411"></i>
+    <span class="muted">text <i style="background:#f5f3eb"></i> focus <i style="background:#cacf01"></i> state <i style="background:#ffffff"></i></span></div>
+</section>
+<section class="card">
+  <header><b>scr10</b> <span class="muted">desc 50061 · pal 50508 · shade 54%</span>
+    <span class="badge ok">chữ/nền 11.26:1</span></header>
+  <div class="stage" style="background-image:url('../../assets/ui/bg/scr10.webp');background-color:#00ff40">
+    <div class="panel" style="--shade:0.54;box-shadow:inset 1px 1px 0 #73735a, inset -1px -1px 0 #423918, inset 2px 2px 0 #6b6b42, inset -2px -2px 0 #4a421c, inset 3px 3px 0 #6b5a42, inset -3px -3px 0 #524a4a">
+      <div class="title" style="color:#d9d0b0;text-shadow:1px 1px 0 #000000">Sảnh chờ — Lobby</div>
+      <div class="row">
+        <button style="box-shadow:inset 1px 1px 0 #73735a, inset -1px -1px 0 #423918, inset 2px 2px 0 #6b6b42, inset -2px -2px 0 #4a421c, inset 3px 3px 0 #6b5a42, inset -3px -3px 0 #524a4a;color:#d9d0b0;text-shadow:1px 1px 0 #000000">Vào phòng</button>
+        <button style="box-shadow:inset 1px 1px 0 #73735a, inset -1px -1px 0 #423918, inset 2px 2px 0 #6b6b42, inset -2px -2px 0 #4a421c, inset 3px 3px 0 #6b5a42, inset -3px -3px 0 #524a4a;color:#cacf01;text-shadow:1px 1px 0 #000000">Hover</button>
+        <button style="box-shadow:inset 1px 1px 0 #423918, inset -1px -1px 0 #73735a, inset 2px 2px 0 #4a421c, inset -2px -2px 0 #6b6b42, inset 3px 3px 0 #524a4a, inset -3px -3px 0 #6b5a42;color:#d9d0b0;text-shadow:1px 1px 0 #000000">Đang nhấn</button>
+      </div>
+      <div class="input" style="box-shadow:inset 1px 1px 0 #423918, inset -1px -1px 0 #73735a, inset 2px 2px 0 #4a421c, inset -2px -2px 0 #6b6b42, inset 3px 3px 0 #524a4a, inset -3px -3px 0 #6b5a42;color:#d9d0b0">Ô nhập (viền lõm)</div>
+    </div>
+  </div>
+  <div class="swatches"><i title="bevel[0] #73735a" style="background:#73735a"></i><i title="bevel[1] #6b6b42" style="background:#6b6b42"></i><i title="bevel[2] #6b5a42" style="background:#6b5a42"></i><i title="bevel[3] #524a4a" style="background:#524a4a"></i><i title="bevel[4] #4a421c" style="background:#4a421c"></i><i title="bevel[5] #423918" style="background:#423918"></i>
+    <span class="muted">text <i style="background:#d9d0b0"></i> focus <i style="background:#cacf01"></i> state <i style="background:#d9d0b0"></i></span></div>
+</section>
+<section class="card">
+  <header><b>hub-temple</b> <span class="muted">desc 50051 · pal 50501 · shade 44%</span>
+    <span class="badge ok">chữ/nền 8.6:1</span></header>
+  <div class="stage" style="background-image:url('../../assets/hub/bg/temple-sunset-logo.webp');background-color:#000000">
+    <div class="panel" style="--shade:0.44;box-shadow:inset 1px 1px 0 #ffde7b, inset -1px -1px 0 #423110, inset 2px 2px 0 #f4bd63, inset -2px -2px 0 #945229, inset 3px 3px 0 #d38939, inset -3px -3px 0 #d38939">
+      <div class="title" style="color:#d9d0b0;text-shadow:1px 1px 0 #000000">Sảnh chờ — Lobby</div>
+      <div class="row">
+        <button style="box-shadow:inset 1px 1px 0 #ffde7b, inset -1px -1px 0 #423110, inset 2px 2px 0 #f4bd63, inset -2px -2px 0 #945229, inset 3px 3px 0 #d38939, inset -3px -3px 0 #d38939;color:#d9d0b0;text-shadow:1px 1px 0 #000000">Vào phòng</button>
+        <button style="box-shadow:inset 1px 1px 0 #ffde7b, inset -1px -1px 0 #423110, inset 2px 2px 0 #f4bd63, inset -2px -2px 0 #945229, inset 3px 3px 0 #d38939, inset -3px -3px 0 #d38939;color:#cacf01;text-shadow:1px 1px 0 #000000">Hover</button>
+        <button style="box-shadow:inset 1px 1px 0 #423110, inset -1px -1px 0 #ffde7b, inset 2px 2px 0 #945229, inset -2px -2px 0 #f4bd63, inset 3px 3px 0 #d38939, inset -3px -3px 0 #d38939;color:#ffffff;text-shadow:1px 1px 0 #000000">Đang nhấn</button>
+      </div>
+      <div class="input" style="box-shadow:inset 1px 1px 0 #423110, inset -1px -1px 0 #ffde7b, inset 2px 2px 0 #945229, inset -2px -2px 0 #f4bd63, inset 3px 3px 0 #d38939, inset -3px -3px 0 #d38939;color:#d9d0b0">Ô nhập (viền lõm)</div>
+    </div>
+  </div>
+  <div class="swatches"><i title="bevel[0] #ffde7b" style="background:#ffde7b"></i><i title="bevel[1] #f4bd63" style="background:#f4bd63"></i><i title="bevel[2] #d38939" style="background:#d38939"></i><i title="bevel[3] #d38939" style="background:#d38939"></i><i title="bevel[4] #945229" style="background:#945229"></i><i title="bevel[5] #423110" style="background:#423110"></i>
+    <span class="muted">text <i style="background:#d9d0b0"></i> focus <i style="background:#cacf01"></i> state <i style="background:#ffffff"></i></span></div>
+</section>
+<section class="card">
+  <header><b>hub-village</b> <span class="muted">desc 50052 · pal 50502 · shade 51%</span>
+    <span class="badge ok">chữ/nền 10.64:1</span></header>
+  <div class="stage" style="background-image:url('../../assets/hub/bg/village-sunset.webp');background-color:#00ff40">
+    <div class="panel" style="--shade:0.51;box-shadow:inset 1px 1px 0 #733b00, inset -1px -1px 0 #2c1806, inset 2px 2px 0 #3b1a03, inset -2px -2px 0 #3b0d02, inset 3px 3px 0 #220a01, inset -3px -3px 0 #130500">
+      <div class="title" style="color:#d9d0b0;text-shadow:1px 1px 0 #000000">Sảnh chờ — Lobby</div>
+      <div class="row">
+        <button style="box-shadow:inset 1px 1px 0 #733b00, inset -1px -1px 0 #2c1806, inset 2px 2px 0 #3b1a03, inset -2px -2px 0 #3b0d02, inset 3px 3px 0 #220a01, inset -3px -3px 0 #130500;color:#d9d0b0;text-shadow:1px 1px 0 #000000">Vào phòng</button>
+        <button style="box-shadow:inset 1px 1px 0 #733b00, inset -1px -1px 0 #2c1806, inset 2px 2px 0 #3b1a03, inset -2px -2px 0 #3b0d02, inset 3px 3px 0 #220a01, inset -3px -3px 0 #130500;color:#cacf01;text-shadow:1px 1px 0 #000000">Hover</button>
+        <button style="box-shadow:inset 1px 1px 0 #2c1806, inset -1px -1px 0 #733b00, inset 2px 2px 0 #3b0d02, inset -2px -2px 0 #3b1a03, inset 3px 3px 0 #130500, inset -3px -3px 0 #220a01;color:#ffffff;text-shadow:1px 1px 0 #000000">Đang nhấn</button>
+      </div>
+      <div class="input" style="box-shadow:inset 1px 1px 0 #2c1806, inset -1px -1px 0 #733b00, inset 2px 2px 0 #3b0d02, inset -2px -2px 0 #3b1a03, inset 3px 3px 0 #130500, inset -3px -3px 0 #220a01;color:#d9d0b0">Ô nhập (viền lõm)</div>
+    </div>
+  </div>
+  <div class="swatches"><i title="bevel[0] #733b00" style="background:#733b00"></i><i title="bevel[1] #3b1a03" style="background:#3b1a03"></i><i title="bevel[2] #220a01" style="background:#220a01"></i><i title="bevel[3] #130500" style="background:#130500"></i><i title="bevel[4] #3b0d02" style="background:#3b0d02"></i><i title="bevel[5] #2c1806" style="background:#2c1806"></i>
+    <span class="muted">text <i style="background:#d9d0b0"></i> focus <i style="background:#cacf01"></i> state <i style="background:#ffffff"></i></span></div>
+</section></div>
+<h2>Theme hộp thoại</h2><div class="grid">
+<section class="card">
+  <header><b>dlg1</b> <span class="muted">desc 50001 · pal 50501 · shade 54%</span>
+    <span class="badge bad">chữ/nền 3.98:1</span></header>
+  <div class="stage" style="background-color:#875639">
+    <div class="panel" style="--shade:0.54;box-shadow:inset 1px 1px 0 #ffef7f, inset -1px -1px 0 #5e1008, inset 2px 2px 0 #ffde8c, inset -2px -2px 0 #6c4e3c, inset 3px 3px 0 #e7a56b, inset -3px -3px 0 #ff9c6b">
+      <div class="title" style="color:#d9d0b0;text-shadow:1px 1px 0 #000000">Sảnh chờ — Lobby</div>
+      <div class="row">
+        <button style="box-shadow:inset 1px 1px 0 #ffef7f, inset -1px -1px 0 #5e1008, inset 2px 2px 0 #ffde8c, inset -2px -2px 0 #6c4e3c, inset 3px 3px 0 #e7a56b, inset -3px -3px 0 #ff9c6b;color:#d9d0b0;text-shadow:1px 1px 0 #000000">Vào phòng</button>
+        <button style="box-shadow:inset 1px 1px 0 #ffef7f, inset -1px -1px 0 #5e1008, inset 2px 2px 0 #ffde8c, inset -2px -2px 0 #6c4e3c, inset 3px 3px 0 #e7a56b, inset -3px -3px 0 #ff9c6b;color:#cacf01;text-shadow:1px 1px 0 #000000">Hover</button>
+        <button style="box-shadow:inset 1px 1px 0 #5e1008, inset -1px -1px 0 #ffef7f, inset 2px 2px 0 #6c4e3c, inset -2px -2px 0 #ffde8c, inset 3px 3px 0 #ff9c6b, inset -3px -3px 0 #e7a56b;color:#ffffff;text-shadow:1px 1px 0 #000000">Đang nhấn</button>
+      </div>
+      <div class="input" style="box-shadow:inset 1px 1px 0 #5e1008, inset -1px -1px 0 #ffef7f, inset 2px 2px 0 #6c4e3c, inset -2px -2px 0 #ffde8c, inset 3px 3px 0 #ff9c6b, inset -3px -3px 0 #e7a56b;color:#d9d0b0">Ô nhập (viền lõm)</div>
+    </div>
+  </div>
+  <div class="swatches"><i title="bevel[0] #ffef7f" style="background:#ffef7f"></i><i title="bevel[1] #ffde8c" style="background:#ffde8c"></i><i title="bevel[2] #e7a56b" style="background:#e7a56b"></i><i title="bevel[3] #ff9c6b" style="background:#ff9c6b"></i><i title="bevel[4] #6c4e3c" style="background:#6c4e3c"></i><i title="bevel[5] #5e1008" style="background:#5e1008"></i>
+    <span class="muted">text <i style="background:#d9d0b0"></i> focus <i style="background:#cacf01"></i> state <i style="background:#ffffff"></i></span></div>
+</section>
+<section class="card">
+  <header><b>dlg2</b> <span class="muted">desc 50002 · pal 50502 · shade 54%</span>
+    <span class="badge ok">chữ/nền 8.86:1</span></header>
+  <div class="stage" style="background-color:#342c27">
+    <div class="panel" style="--shade:0.54;box-shadow:inset 1px 1px 0 #733b00, inset -1px -1px 0 #2c1806, inset 2px 2px 0 #3b1a03, inset -2px -2px 0 #3b0d02, inset 3px 3px 0 #220a01, inset -3px -3px 0 #130500">
+      <div class="title" style="color:#d9d0b0;text-shadow:1px 1px 0 #000000">Sảnh chờ — Lobby</div>
+      <div class="row">
+        <button style="box-shadow:inset 1px 1px 0 #733b00, inset -1px -1px 0 #2c1806, inset 2px 2px 0 #3b1a03, inset -2px -2px 0 #3b0d02, inset 3px 3px 0 #220a01, inset -3px -3px 0 #130500;color:#d9d0b0;text-shadow:1px 1px 0 #000000">Vào phòng</button>
+        <button style="box-shadow:inset 1px 1px 0 #733b00, inset -1px -1px 0 #2c1806, inset 2px 2px 0 #3b1a03, inset -2px -2px 0 #3b0d02, inset 3px 3px 0 #220a01, inset -3px -3px 0 #130500;color:#cacf01;text-shadow:1px 1px 0 #000000">Hover</button>
+        <button style="box-shadow:inset 1px 1px 0 #2c1806, inset -1px -1px 0 #733b00, inset 2px 2px 0 #3b0d02, inset -2px -2px 0 #3b1a03, inset 3px 3px 0 #130500, inset -3px -3px 0 #220a01;color:#ffffff;text-shadow:1px 1px 0 #000000">Đang nhấn</button>
+      </div>
+      <div class="input" style="box-shadow:inset 1px 1px 0 #2c1806, inset -1px -1px 0 #733b00, inset 2px 2px 0 #3b0d02, inset -2px -2px 0 #3b1a03, inset 3px 3px 0 #130500, inset -3px -3px 0 #220a01;color:#d9d0b0">Ô nhập (viền lõm)</div>
+    </div>
+  </div>
+  <div class="swatches"><i title="bevel[0] #733b00" style="background:#733b00"></i><i title="bevel[1] #3b1a03" style="background:#3b1a03"></i><i title="bevel[2] #220a01" style="background:#220a01"></i><i title="bevel[3] #130500" style="background:#130500"></i><i title="bevel[4] #3b0d02" style="background:#3b0d02"></i><i title="bevel[5] #2c1806" style="background:#2c1806"></i>
+    <span class="muted">text <i style="background:#d9d0b0"></i> focus <i style="background:#cacf01"></i> state <i style="background:#ffffff"></i></span></div>
+</section>
+<section class="card">
+  <header><b>dlg3</b> <span class="muted">desc 50003 · pal 50503 · shade 54%</span>
+    <span class="badge ok">chữ/nền 8.44:1</span></header>
+  <div class="stage" style="background-image:url('../../raw/interfac/50204.png');background-color:#c1944e">
+    <div class="panel" style="--shade:0.54;box-shadow:inset 1px 1px 0 #e3d09f, inset -1px -1px 0 #432d22, inset 2px 2px 0 #c59d81, inset -2px -2px 0 #685539, inset 3px 3px 0 #b6825d, inset -3px -3px 0 #89624a">
+      <div class="title" style="color:#ffffff;text-shadow:1px 1px 0 #000000">Sảnh chờ — Lobby</div>
+      <div class="row">
+        <button style="box-shadow:inset 1px 1px 0 #e3d09f, inset -1px -1px 0 #432d22, inset 2px 2px 0 #c59d81, inset -2px -2px 0 #685539, inset 3px 3px 0 #b6825d, inset -3px -3px 0 #89624a;color:#ffffff;text-shadow:1px 1px 0 #000000">Vào phòng</button>
+        <button style="box-shadow:inset 1px 1px 0 #e3d09f, inset -1px -1px 0 #432d22, inset 2px 2px 0 #c59d81, inset -2px -2px 0 #685539, inset 3px 3px 0 #b6825d, inset -3px -3px 0 #89624a;color:#cacf01;text-shadow:1px 1px 0 #000000">Hover</button>
+        <button style="box-shadow:inset 1px 1px 0 #432d22, inset -1px -1px 0 #e3d09f, inset 2px 2px 0 #685539, inset -2px -2px 0 #c59d81, inset 3px 3px 0 #89624a, inset -3px -3px 0 #b6825d;color:#ffffff;text-shadow:1px 1px 0 #000000">Đang nhấn</button>
+      </div>
+      <div class="input" style="box-shadow:inset 1px 1px 0 #432d22, inset -1px -1px 0 #e3d09f, inset 2px 2px 0 #685539, inset -2px -2px 0 #c59d81, inset 3px 3px 0 #89624a, inset -3px -3px 0 #b6825d;color:#ffffff">Ô nhập (viền lõm)</div>
+    </div>
+  </div>
+  <div class="swatches"><i title="bevel[0] #e3d09f" style="background:#e3d09f"></i><i title="bevel[1] #c59d81" style="background:#c59d81"></i><i title="bevel[2] #b6825d" style="background:#b6825d"></i><i title="bevel[3] #89624a" style="background:#89624a"></i><i title="bevel[4] #685539" style="background:#685539"></i><i title="bevel[5] #432d22" style="background:#432d22"></i>
+    <span class="muted">text <i style="background:#ffffff"></i> focus <i style="background:#cacf01"></i> state <i style="background:#ffffff"></i></span></div>
+</section>
+<section class="card">
+  <header><b>dlg4</b> <span class="muted">desc 50004 · pal 50504 · shade 54%</span>
+    <span class="badge bad">chữ/nền 4.4:1</span></header>
+  <div class="stage" style="background-color:#94724b">
+    <div class="panel" style="--shade:0.54;box-shadow:inset 1px 1px 0 #a27635, inset -1px -1px 0 #0c0a09, inset 2px 2px 0 #634821, inset -2px -2px 0 #2d210f, inset 3px 3px 0 #493418, inset -3px -3px 0 #201a10">
+      <div class="title" style="color:#ffffff;text-shadow:1px 1px 0 #000000">Sảnh chờ — Lobby</div>
+      <div class="row">
+        <button style="box-shadow:inset 1px 1px 0 #a27635, inset -1px -1px 0 #0c0a09, inset 2px 2px 0 #634821, inset -2px -2px 0 #2d210f, inset 3px 3px 0 #493418, inset -3px -3px 0 #201a10;color:#ffffff;text-shadow:1px 1px 0 #000000">Vào phòng</button>
+        <button style="box-shadow:inset 1px 1px 0 #a27635, inset -1px -1px 0 #0c0a09, inset 2px 2px 0 #634821, inset -2px -2px 0 #2d210f, inset 3px 3px 0 #493418, inset -3px -3px 0 #201a10;color:#cacf01;text-shadow:1px 1px 0 #000000">Hover</button>
+        <button style="box-shadow:inset 1px 1px 0 #0c0a09, inset -1px -1px 0 #a27635, inset 2px 2px 0 #2d210f, inset -2px -2px 0 #634821, inset 3px 3px 0 #201a10, inset -3px -3px 0 #493418;color:#ffffff;text-shadow:1px 1px 0 #000000">Đang nhấn</button>
+      </div>
+      <div class="input" style="box-shadow:inset 1px 1px 0 #0c0a09, inset -1px -1px 0 #a27635, inset 2px 2px 0 #2d210f, inset -2px -2px 0 #634821, inset 3px 3px 0 #201a10, inset -3px -3px 0 #493418;color:#ffffff">Ô nhập (viền lõm)</div>
+    </div>
+  </div>
+  <div class="swatches"><i title="bevel[0] #a27635" style="background:#a27635"></i><i title="bevel[1] #634821" style="background:#634821"></i><i title="bevel[2] #493418" style="background:#493418"></i><i title="bevel[3] #201a10" style="background:#201a10"></i><i title="bevel[4] #2d210f" style="background:#2d210f"></i><i title="bevel[5] #0c0a09" style="background:#0c0a09"></i>
+    <span class="muted">text <i style="background:#ffffff"></i> focus <i style="background:#cacf01"></i> state <i style="background:#ffffff"></i></span></div>
+</section>
+<section class="card">
+  <header><b>dlg5</b> <span class="muted">desc 50005 · pal 50500 · shade 5%</span>
+    <span class="badge ok">chữ/nền 21.0:1</span></header>
+  <div class="stage" style="background-color:#000000">
+    <div class="panel" style="--shade:0.05;box-shadow:inset 1px 1px 0 #dbdbdb, inset -1px -1px 0 #474747, inset 2px 2px 0 #c7c7c7, inset -2px -2px 0 #6b6b6b, inset 3px 3px 0 #b3b3b3, inset -3px -3px 0 #8f8f8f">
+      <div class="title" style="color:#ffffff;text-shadow:1px 1px 0 #000000">Sảnh chờ — Lobby</div>
+      <div class="row">
+        <button style="box-shadow:inset 1px 1px 0 #dbdbdb, inset -1px -1px 0 #474747, inset 2px 2px 0 #c7c7c7, inset -2px -2px 0 #6b6b6b, inset 3px 3px 0 #b3b3b3, inset -3px -3px 0 #8f8f8f;color:#ffffff;text-shadow:1px 1px 0 #000000">Vào phòng</button>
+        <button style="box-shadow:inset 1px 1px 0 #dbdbdb, inset -1px -1px 0 #474747, inset 2px 2px 0 #c7c7c7, inset -2px -2px 0 #6b6b6b, inset 3px 3px 0 #b3b3b3, inset -3px -3px 0 #8f8f8f;color:#ffff00;text-shadow:1px 1px 0 #000000">Hover</button>
+        <button style="box-shadow:inset 1px 1px 0 #474747, inset -1px -1px 0 #dbdbdb, inset 2px 2px 0 #6b6b6b, inset -2px -2px 0 #c7c7c7, inset 3px 3px 0 #8f8f8f, inset -3px -3px 0 #b3b3b3;color:#ffffff;text-shadow:1px 1px 0 #000000">Đang nhấn</button>
+      </div>
+      <div class="input" style="box-shadow:inset 1px 1px 0 #474747, inset -1px -1px 0 #dbdbdb, inset 2px 2px 0 #6b6b6b, inset -2px -2px 0 #c7c7c7, inset 3px 3px 0 #8f8f8f, inset -3px -3px 0 #b3b3b3;color:#ffffff">Ô nhập (viền lõm)</div>
+    </div>
+  </div>
+  <div class="swatches"><i title="bevel[0] #dbdbdb" style="background:#dbdbdb"></i><i title="bevel[1] #c7c7c7" style="background:#c7c7c7"></i><i title="bevel[2] #b3b3b3" style="background:#b3b3b3"></i><i title="bevel[3] #8f8f8f" style="background:#8f8f8f"></i><i title="bevel[4] #6b6b6b" style="background:#6b6b6b"></i><i title="bevel[5] #474747" style="background:#474747"></i>
+    <span class="muted">text <i style="background:#ffffff"></i> focus <i style="background:#ffff00"></i> state <i style="background:#ffffff"></i></span></div>
+</section>
+<section class="card">
+  <header><b>dlg6_0</b> <span class="muted">desc 50006 · pal 50500 · shade 45%</span>
+    <span class="badge ok">chữ/nền 6.26:1</span></header>
+  <div class="stage" style="background-image:url('../../raw/interfac/50210.png');background-color:#b3b3b3">
+    <div class="panel" style="--shade:0.45;box-shadow:inset 1px 1px 0 #ebe3db, inset -1px -1px 0 #6b4b27, inset 2px 2px 0 #dfc39f, inset -2px -2px 0 #976f4f, inset 3px 3px 0 #d3ab7f, inset -3px -3px 0 #d3ab7f">
+      <div class="title" style="color:#ffffff;text-shadow:1px 1px 0 #000000">Sảnh chờ — Lobby</div>
+      <div class="row">
+        <button style="box-shadow:inset 1px 1px 0 #ebe3db, inset -1px -1px 0 #6b4b27, inset 2px 2px 0 #dfc39f, inset -2px -2px 0 #976f4f, inset 3px 3px 0 #d3ab7f, inset -3px -3px 0 #d3ab7f;color:#ffffff;text-shadow:1px 1px 0 #000000">Vào phòng</button>
+        <button style="box-shadow:inset 1px 1px 0 #ebe3db, inset -1px -1px 0 #6b4b27, inset 2px 2px 0 #dfc39f, inset -2px -2px 0 #976f4f, inset 3px 3px 0 #d3ab7f, inset -3px -3px 0 #d3ab7f;color:#ffff00;text-shadow:1px 1px 0 #000000">Hover</button>
+        <button style="box-shadow:inset 1px 1px 0 #6b4b27, inset -1px -1px 0 #ebe3db, inset 2px 2px 0 #976f4f, inset -2px -2px 0 #dfc39f, inset 3px 3px 0 #d3ab7f, inset -3px -3px 0 #d3ab7f;color:#ffffff;text-shadow:1px 1px 0 #000000">Đang nhấn</button>
+      </div>
+      <div class="input" style="box-shadow:inset 1px 1px 0 #6b4b27, inset -1px -1px 0 #ebe3db, inset 2px 2px 0 #976f4f, inset -2px -2px 0 #dfc39f, inset 3px 3px 0 #d3ab7f, inset -3px -3px 0 #d3ab7f;color:#ffffff">Ô nhập (viền lõm)</div>
+    </div>
+  </div>
+  <div class="swatches"><i title="bevel[0] #ebe3db" style="background:#ebe3db"></i><i title="bevel[1] #dfc39f" style="background:#dfc39f"></i><i title="bevel[2] #d3ab7f" style="background:#d3ab7f"></i><i title="bevel[3] #d3ab7f" style="background:#d3ab7f"></i><i title="bevel[4] #976f4f" style="background:#976f4f"></i><i title="bevel[5] #6b4b27" style="background:#6b4b27"></i>
+    <span class="muted">text <i style="background:#ffffff"></i> focus <i style="background:#ffff00"></i> state <i style="background:#ffffff"></i></span></div>
+</section>
+<section class="card">
+  <header><b>dlg6_1</b> <span class="muted">desc 50007 · pal 50500 · shade 36%</span>
+    <span class="badge ok">chữ/nền 6.19:1</span></header>
+  <div class="stage" style="background-image:url('../../raw/interfac/50212.png');background-color:#b3b3b3">
+    <div class="panel" style="--shade:0.36;box-shadow:inset 1px 1px 0 #dbdbdb, inset -1px -1px 0 #7f7f7f, inset 2px 2px 0 #c7c7c7, inset -2px -2px 0 #a3a3a3, inset 3px 3px 0 #b3b3b3, inset -3px -3px 0 #b3b3b3">
+      <div class="title" style="color:#ffffff;text-shadow:1px 1px 0 #000000">Sảnh chờ — Lobby</div>
+      <div class="row">
+        <button style="box-shadow:inset 1px 1px 0 #dbdbdb, inset -1px -1px 0 #7f7f7f, inset 2px 2px 0 #c7c7c7, inset -2px -2px 0 #a3a3a3, inset 3px 3px 0 #b3b3b3, inset -3px -3px 0 #b3b3b3;color:#ffffff;text-shadow:1px 1px 0 #000000">Vào phòng</button>
+        <button style="box-shadow:inset 1px 1px 0 #dbdbdb, inset -1px -1px 0 #7f7f7f, inset 2px 2px 0 #c7c7c7, inset -2px -2px 0 #a3a3a3, inset 3px 3px 0 #b3b3b3, inset -3px -3px 0 #b3b3b3;color:#ffff00;text-shadow:1px 1px 0 #000000">Hover</button>
+        <button style="box-shadow:inset 1px 1px 0 #7f7f7f, inset -1px -1px 0 #dbdbdb, inset 2px 2px 0 #a3a3a3, inset -2px -2px 0 #c7c7c7, inset 3px 3px 0 #b3b3b3, inset -3px -3px 0 #b3b3b3;color:#ffffff;text-shadow:1px 1px 0 #000000">Đang nhấn</button>
+      </div>
+      <div class="input" style="box-shadow:inset 1px 1px 0 #7f7f7f, inset -1px -1px 0 #dbdbdb, inset 2px 2px 0 #a3a3a3, inset -2px -2px 0 #c7c7c7, inset 3px 3px 0 #b3b3b3, inset -3px -3px 0 #b3b3b3;color:#ffffff">Ô nhập (viền lõm)</div>
+    </div>
+  </div>
+  <div class="swatches"><i title="bevel[0] #dbdbdb" style="background:#dbdbdb"></i><i title="bevel[1] #c7c7c7" style="background:#c7c7c7"></i><i title="bevel[2] #b3b3b3" style="background:#b3b3b3"></i><i title="bevel[3] #b3b3b3" style="background:#b3b3b3"></i><i title="bevel[4] #a3a3a3" style="background:#a3a3a3"></i><i title="bevel[5] #7f7f7f" style="background:#7f7f7f"></i>
+    <span class="muted">text <i style="background:#ffffff"></i> focus <i style="background:#ffff00"></i> state <i style="background:#ffffff"></i></span></div>
+</section>
+<section class="card">
+  <header><b>dlg6_2</b> <span class="muted">desc 50008 · pal 50500 · shade 37%</span>
+    <span class="badge ok">chữ/nền 14.27:1</span></header>
+  <div class="stage" style="background-image:url('../../raw/interfac/50214.png');background-color:#b3b3b3">
+    <div class="panel" style="--shade:0.37;box-shadow:inset 1px 1px 0 #5b5b5b, inset -1px -1px 0 #232323, inset 2px 2px 0 #474747, inset -2px -2px 0 #373737, inset 3px 3px 0 #373737, inset -3px -3px 0 #373737">
+      <div class="title" style="color:#ffffff;text-shadow:1px 1px 0 #000000">Sảnh chờ — Lobby</div>
+      <div class="row">
+        <button style="box-shadow:inset 1px 1px 0 #5b5b5b, inset -1px -1px 0 #232323, inset 2px 2px 0 #474747, inset -2px -2px 0 #373737, inset 3px 3px 0 #373737, inset -3px -3px 0 #373737;color:#ffffff;text-shadow:1px 1px 0 #000000">Vào phòng</button>
+        <button style="box-shadow:inset 1px 1px 0 #5b5b5b, inset -1px -1px 0 #232323, inset 2px 2px 0 #474747, inset -2px -2px 0 #373737, inset 3px 3px 0 #373737, inset -3px -3px 0 #373737;color:#ffff00;text-shadow:1px 1px 0 #000000">Hover</button>
+        <button style="box-shadow:inset 1px 1px 0 #232323, inset -1px -1px 0 #5b5b5b, inset 2px 2px 0 #373737, inset -2px -2px 0 #474747, inset 3px 3px 0 #373737, inset -3px -3px 0 #373737;color:#ffffff;text-shadow:1px 1px 0 #000000">Đang nhấn</button>
+      </div>
+      <div class="input" style="box-shadow:inset 1px 1px 0 #232323, inset -1px -1px 0 #5b5b5b, inset 2px 2px 0 #373737, inset -2px -2px 0 #474747, inset 3px 3px 0 #373737, inset -3px -3px 0 #373737;color:#ffffff">Ô nhập (viền lõm)</div>
+    </div>
+  </div>
+  <div class="swatches"><i title="bevel[0] #5b5b5b" style="background:#5b5b5b"></i><i title="bevel[1] #474747" style="background:#474747"></i><i title="bevel[2] #373737" style="background:#373737"></i><i title="bevel[3] #373737" style="background:#373737"></i><i title="bevel[4] #373737" style="background:#373737"></i><i title="bevel[5] #232323" style="background:#232323"></i>
+    <span class="muted">text <i style="background:#ffffff"></i> focus <i style="background:#ffff00"></i> state <i style="background:#ffffff"></i></span></div>
+</section>
+<section class="card">
+  <header><b>dlg6_3</b> <span class="muted">desc 50009 · pal 50500 · shade 31%</span>
+    <span class="badge ok">chữ/nền 8.3:1</span></header>
+  <div class="stage" style="background-image:url('../../raw/interfac/50216.png');background-color:#b3b3b3">
+    <div class="panel" style="--shade:0.31;box-shadow:inset 1px 1px 0 #c7b7af, inset -1px -1px 0 #573b2b, inset 2px 2px 0 #af835f, inset -2px -2px 0 #6b4b27, inset 3px 3px 0 #976f4f, inset -3px -3px 0 #976f4f">
+      <div class="title" style="color:#ffffff;text-shadow:1px 1px 0 #000000">Sảnh chờ — Lobby</div>
+      <div class="row">
+        <button style="box-shadow:inset 1px 1px 0 #c7b7af, inset -1px -1px 0 #573b2b, inset 2px 2px 0 #af835f, inset -2px -2px 0 #6b4b27, inset 3px 3px 0 #976f4f, inset -3px -3px 0 #976f4f;color:#ffffff;text-shadow:1px 1px 0 #000000">Vào phòng</button>
+        <button style="box-shadow:inset 1px 1px 0 #c7b7af, inset -1px -1px 0 #573b2b, inset 2px 2px 0 #af835f, inset -2px -2px 0 #6b4b27, inset 3px 3px 0 #976f4f, inset -3px -3px 0 #976f4f;color:#ffff00;text-shadow:1px 1px 0 #000000">Hover</button>
+        <button style="box-shadow:inset 1px 1px 0 #573b2b, inset -1px -1px 0 #c7b7af, inset 2px 2px 0 #6b4b27, inset -2px -2px 0 #af835f, inset 3px 3px 0 #976f4f, inset -3px -3px 0 #976f4f;color:#ffffff;text-shadow:1px 1px 0 #000000">Đang nhấn</button>
+      </div>
+      <div class="input" style="box-shadow:inset 1px 1px 0 #573b2b, inset -1px -1px 0 #c7b7af, inset 2px 2px 0 #6b4b27, inset -2px -2px 0 #af835f, inset 3px 3px 0 #976f4f, inset -3px -3px 0 #976f4f;color:#ffffff">Ô nhập (viền lõm)</div>
+    </div>
+  </div>
+  <div class="swatches"><i title="bevel[0] #c7b7af" style="background:#c7b7af"></i><i title="bevel[1] #af835f" style="background:#af835f"></i><i title="bevel[2] #976f4f" style="background:#976f4f"></i><i title="bevel[3] #976f4f" style="background:#976f4f"></i><i title="bevel[4] #6b4b27" style="background:#6b4b27"></i><i title="bevel[5] #573b2b" style="background:#573b2b"></i>
+    <span class="muted">text <i style="background:#ffffff"></i> focus <i style="background:#ffff00"></i> state <i style="background:#ffffff"></i></span></div>
+</section>
+<section class="card">
+  <header><b>dlg6_4</b> <span class="muted">desc 53000 · pal 50500 · shade 31%</span>
+    <span class="badge ok">chữ/nền 13.97:1</span></header>
+  <div class="stage" style="background-image:url('../../raw/interfac/53003.png');background-color:#b3b3b3">
+    <div class="panel" style="--shade:0.31;box-shadow:inset 1px 1px 0 #6b6b6b, inset -1px -1px 0 #232323, inset 2px 2px 0 #474747, inset -2px -2px 0 #373737, inset 3px 3px 0 #373737, inset -3px -3px 0 #474747">
+      <div class="title" style="color:#ffffff;text-shadow:1px 1px 0 #000000">Sảnh chờ — Lobby</div>
+      <div class="row">
+        <button style="box-shadow:inset 1px 1px 0 #6b6b6b, inset -1px -1px 0 #232323, inset 2px 2px 0 #474747, inset -2px -2px 0 #373737, inset 3px 3px 0 #373737, inset -3px -3px 0 #474747;color:#ffffff;text-shadow:1px 1px 0 #000000">Vào phòng</button>
+        <button style="box-shadow:inset 1px 1px 0 #6b6b6b, inset -1px -1px 0 #232323, inset 2px 2px 0 #474747, inset -2px -2px 0 #373737, inset 3px 3px 0 #373737, inset -3px -3px 0 #474747;color:#ffff00;text-shadow:1px 1px 0 #000000">Hover</button>
+        <button style="box-shadow:inset 1px 1px 0 #232323, inset -1px -1px 0 #6b6b6b, inset 2px 2px 0 #373737, inset -2px -2px 0 #474747, inset 3px 3px 0 #474747, inset -3px -3px 0 #373737;color:#ffffff;text-shadow:1px 1px 0 #000000">Đang nhấn</button>
+      </div>
+      <div class="input" style="box-shadow:inset 1px 1px 0 #232323, inset -1px -1px 0 #6b6b6b, inset 2px 2px 0 #373737, inset -2px -2px 0 #474747, inset 3px 3px 0 #474747, inset -3px -3px 0 #373737;color:#ffffff">Ô nhập (viền lõm)</div>
+    </div>
+  </div>
+  <div class="swatches"><i title="bevel[0] #6b6b6b" style="background:#6b6b6b"></i><i title="bevel[1] #474747" style="background:#474747"></i><i title="bevel[2] #373737" style="background:#373737"></i><i title="bevel[3] #474747" style="background:#474747"></i><i title="bevel[4] #373737" style="background:#373737"></i><i title="bevel[5] #232323" style="background:#232323"></i>
+    <span class="muted">text <i style="background:#ffffff"></i> focus <i style="background:#ffff00"></i> state <i style="background:#ffffff"></i></span></div>
+</section>
+<section class="card">
+  <header><b>dlg10</b> <span class="muted">desc 50010 · pal 50505 · shade 54%</span>
+    <span class="badge ok">chữ/nền 5.0:1</span></header>
+  <div class="stage" style="background-color:#5a5242">
+    <div class="panel" style="--shade:0.54;box-shadow:inset 1px 1px 0 #7b6352, inset -1px -1px 0 #212121, inset 2px 2px 0 #725228, inset -2px -2px 0 #3b160e, inset 3px 3px 0 #5a5242, inset -3px -3px 0 #4e4631">
+      <div class="title" style="color:#d9d0b0;text-shadow:1px 1px 0 #000000">Sảnh chờ — Lobby</div>
+      <div class="row">
+        <button style="box-shadow:inset 1px 1px 0 #7b6352, inset -1px -1px 0 #212121, inset 2px 2px 0 #725228, inset -2px -2px 0 #3b160e, inset 3px 3px 0 #5a5242, inset -3px -3px 0 #4e4631;color:#d9d0b0;text-shadow:1px 1px 0 #000000">Vào phòng</button>
+        <button style="box-shadow:inset 1px 1px 0 #7b6352, inset -1px -1px 0 #212121, inset 2px 2px 0 #725228, inset -2px -2px 0 #3b160e, inset 3px 3px 0 #5a5242, inset -3px -3px 0 #4e4631;color:#cacf01;text-shadow:1px 1px 0 #000000">Hover</button>
+        <button style="box-shadow:inset 1px 1px 0 #212121, inset -1px -1px 0 #7b6352, inset 2px 2px 0 #3b160e, inset -2px -2px 0 #725228, inset 3px 3px 0 #4e4631, inset -3px -3px 0 #5a5242;color:#d9d0b0;text-shadow:1px 1px 0 #000000">Đang nhấn</button>
+      </div>
+      <div class="input" style="box-shadow:inset 1px 1px 0 #212121, inset -1px -1px 0 #7b6352, inset 2px 2px 0 #3b160e, inset -2px -2px 0 #725228, inset 3px 3px 0 #4e4631, inset -3px -3px 0 #5a5242;color:#d9d0b0">Ô nhập (viền lõm)</div>
+    </div>
+  </div>
+  <div class="swatches"><i title="bevel[0] #7b6352" style="background:#7b6352"></i><i title="bevel[1] #725228" style="background:#725228"></i><i title="bevel[2] #5a5242" style="background:#5a5242"></i><i title="bevel[3] #4e4631" style="background:#4e4631"></i><i title="bevel[4] #3b160e" style="background:#3b160e"></i><i title="bevel[5] #212121" style="background:#212121"></i>
+    <span class="muted">text <i style="background:#d9d0b0"></i> focus <i style="background:#cacf01"></i> state <i style="background:#d9d0b0"></i></span></div>
+</section>
+<section class="card">
+  <header><b>dlg11</b> <span class="muted">desc 50011 · pal 50506 · shade 54%</span>
+    <span class="badge ok">chữ/nền 6.43:1</span></header>
+  <div class="stage" style="background-color:#633900">
+    <div class="panel" style="--shade:0.54;box-shadow:inset 1px 1px 0 #8c6535, inset -1px -1px 0 #392100, inset 2px 2px 0 #7b4418, inset -2px -2px 0 #632900, inset 3px 3px 0 #633900, inset -3px -3px 0 #633900">
+      <div class="title" style="color:#d9d0b0;text-shadow:1px 1px 0 #000000">Sảnh chờ — Lobby</div>
+      <div class="row">
+        <button style="box-shadow:inset 1px 1px 0 #8c6535, inset -1px -1px 0 #392100, inset 2px 2px 0 #7b4418, inset -2px -2px 0 #632900, inset 3px 3px 0 #633900, inset -3px -3px 0 #633900;color:#d9d0b0;text-shadow:1px 1px 0 #000000">Vào phòng</button>
+        <button style="box-shadow:inset 1px 1px 0 #8c6535, inset -1px -1px 0 #392100, inset 2px 2px 0 #7b4418, inset -2px -2px 0 #632900, inset 3px 3px 0 #633900, inset -3px -3px 0 #633900;color:#cacf01;text-shadow:1px 1px 0 #000000">Hover</button>
+        <button style="box-shadow:inset 1px 1px 0 #392100, inset -1px -1px 0 #8c6535, inset 2px 2px 0 #632900, inset -2px -2px 0 #7b4418, inset 3px 3px 0 #633900, inset -3px -3px 0 #633900;color:#ffffff;text-shadow:1px 1px 0 #000000">Đang nhấn</button>
+      </div>
+      <div class="input" style="box-shadow:inset 1px 1px 0 #392100, inset -1px -1px 0 #8c6535, inset 2px 2px 0 #632900, inset -2px -2px 0 #7b4418, inset 3px 3px 0 #633900, inset -3px -3px 0 #633900;color:#d9d0b0">Ô nhập (viền lõm)</div>
+    </div>
+  </div>
+  <div class="swatches"><i title="bevel[0] #8c6535" style="background:#8c6535"></i><i title="bevel[1] #7b4418" style="background:#7b4418"></i><i title="bevel[2] #633900" style="background:#633900"></i><i title="bevel[3] #633900" style="background:#633900"></i><i title="bevel[4] #632900" style="background:#632900"></i><i title="bevel[5] #392100" style="background:#392100"></i>
+    <span class="muted">text <i style="background:#d9d0b0"></i> focus <i style="background:#cacf01"></i> state <i style="background:#ffffff"></i></span></div>
+</section>
+<section class="card">
+  <header><b>dlg12</b> <span class="muted">desc 50012 · pal 50507 · shade 54%</span>
+    <span class="badge bad">chữ/nền 2.95:1</span></header>
+  <div class="stage" style="background-color:#af8750">
+    <div class="panel" style="--shade:0.54;box-shadow:inset 1px 1px 0 #e4d4b0, inset -1px -1px 0 #533411, inset 2px 2px 0 #b69f64, inset -2px -2px 0 #734e2d, inset 3px 3px 0 #af8750, inset -3px -3px 0 #886241">
+      <div class="title" style="color:#f5f3eb;text-shadow:1px 1px 0 #000000">Sảnh chờ — Lobby</div>
+      <div class="row">
+        <button style="box-shadow:inset 1px 1px 0 #e4d4b0, inset -1px -1px 0 #533411, inset 2px 2px 0 #b69f64, inset -2px -2px 0 #734e2d, inset 3px 3px 0 #af8750, inset -3px -3px 0 #886241;color:#f5f3eb;text-shadow:1px 1px 0 #000000">Vào phòng</button>
+        <button style="box-shadow:inset 1px 1px 0 #e4d4b0, inset -1px -1px 0 #533411, inset 2px 2px 0 #b69f64, inset -2px -2px 0 #734e2d, inset 3px 3px 0 #af8750, inset -3px -3px 0 #886241;color:#cacf01;text-shadow:1px 1px 0 #000000">Hover</button>
+        <button style="box-shadow:inset 1px 1px 0 #533411, inset -1px -1px 0 #e4d4b0, inset 2px 2px 0 #734e2d, inset -2px -2px 0 #b69f64, inset 3px 3px 0 #886241, inset -3px -3px 0 #af8750;color:#ffffff;text-shadow:1px 1px 0 #000000">Đang nhấn</button>
+      </div>
+      <div class="input" style="box-shadow:inset 1px 1px 0 #533411, inset -1px -1px 0 #e4d4b0, inset 2px 2px 0 #734e2d, inset -2px -2px 0 #b69f64, inset 3px 3px 0 #886241, inset -3px -3px 0 #af8750;color:#f5f3eb">Ô nhập (viền lõm)</div>
+    </div>
+  </div>
+  <div class="swatches"><i title="bevel[0] #e4d4b0" style="background:#e4d4b0"></i><i title="bevel[1] #b69f64" style="background:#b69f64"></i><i title="bevel[2] #af8750" style="background:#af8750"></i><i title="bevel[3] #886241" style="background:#886241"></i><i title="bevel[4] #734e2d" style="background:#734e2d"></i><i title="bevel[5] #533411" style="background:#533411"></i>
+    <span class="muted">text <i style="background:#f5f3eb"></i> focus <i style="background:#cacf01"></i> state <i style="background:#ffffff"></i></span></div>
+</section>
+<section class="card">
+  <header><b>dlg13</b> <span class="muted">desc 50013 · pal 50508 · shade 54%</span>
+    <span class="badge bad">chữ/nền 4.3:1</span></header>
+  <div class="stage" style="background-color:#6b5a42">
+    <div class="panel" style="--shade:0.54;box-shadow:inset 1px 1px 0 #73735a, inset -1px -1px 0 #423918, inset 2px 2px 0 #6b6b42, inset -2px -2px 0 #4a421c, inset 3px 3px 0 #6b5a42, inset -3px -3px 0 #524a4a">
+      <div class="title" style="color:#d9d0b0;text-shadow:1px 1px 0 #000000">Sảnh chờ — Lobby</div>
+      <div class="row">
+        <button style="box-shadow:inset 1px 1px 0 #73735a, inset -1px -1px 0 #423918, inset 2px 2px 0 #6b6b42, inset -2px -2px 0 #4a421c, inset 3px 3px 0 #6b5a42, inset -3px -3px 0 #524a4a;color:#d9d0b0;text-shadow:1px 1px 0 #000000">Vào phòng</button>
+        <button style="box-shadow:inset 1px 1px 0 #73735a, inset -1px -1px 0 #423918, inset 2px 2px 0 #6b6b42, inset -2px -2px 0 #4a421c, inset 3px 3px 0 #6b5a42, inset -3px -3px 0 #524a4a;color:#cacf01;text-shadow:1px 1px 0 #000000">Hover</button>
+        <button style="box-shadow:inset 1px 1px 0 #423918, inset -1px -1px 0 #73735a, inset 2px 2px 0 #4a421c, inset -2px -2px 0 #6b6b42, inset 3px 3px 0 #524a4a, inset -3px -3px 0 #6b5a42;color:#d9d0b0;text-shadow:1px 1px 0 #000000">Đang nhấn</button>
+      </div>
+      <div class="input" style="box-shadow:inset 1px 1px 0 #423918, inset -1px -1px 0 #73735a, inset 2px 2px 0 #4a421c, inset -2px -2px 0 #6b6b42, inset 3px 3px 0 #524a4a, inset -3px -3px 0 #6b5a42;color:#d9d0b0">Ô nhập (viền lõm)</div>
+    </div>
+  </div>
+  <div class="swatches"><i title="bevel[0] #73735a" style="background:#73735a"></i><i title="bevel[1] #6b6b42" style="background:#6b6b42"></i><i title="bevel[2] #6b5a42" style="background:#6b5a42"></i><i title="bevel[3] #524a4a" style="background:#524a4a"></i><i title="bevel[4] #4a421c" style="background:#4a421c"></i><i title="bevel[5] #423918" style="background:#423918"></i>
+    <span class="muted">text <i style="background:#d9d0b0"></i> focus <i style="background:#cacf01"></i> state <i style="background:#d9d0b0"></i></span></div>
+</section>
+<section class="card">
+  <header><b>hub-wood</b> <span class="muted">desc 50009 · pal 50500 · shade 31%</span>
+    <span class="badge ok">chữ/nền 9.34:1</span></header>
+  <div class="stage" style="background-image:url('../../assets/hub/dialog/wood.png');background-color:#b3b3b3">
+    <div class="panel" style="--shade:0.31;box-shadow:inset 1px 1px 0 #c7b7af, inset -1px -1px 0 #573b2b, inset 2px 2px 0 #af835f, inset -2px -2px 0 #6b4b27, inset 3px 3px 0 #976f4f, inset -3px -3px 0 #976f4f">
+      <div class="title" style="color:#ffffff;text-shadow:1px 1px 0 #000000">Sảnh chờ — Lobby</div>
+      <div class="row">
+        <button style="box-shadow:inset 1px 1px 0 #c7b7af, inset -1px -1px 0 #573b2b, inset 2px 2px 0 #af835f, inset -2px -2px 0 #6b4b27, inset 3px 3px 0 #976f4f, inset -3px -3px 0 #976f4f;color:#ffffff;text-shadow:1px 1px 0 #000000">Vào phòng</button>
+        <button style="box-shadow:inset 1px 1px 0 #c7b7af, inset -1px -1px 0 #573b2b, inset 2px 2px 0 #af835f, inset -2px -2px 0 #6b4b27, inset 3px 3px 0 #976f4f, inset -3px -3px 0 #976f4f;color:#ffff00;text-shadow:1px 1px 0 #000000">Hover</button>
+        <button style="box-shadow:inset 1px 1px 0 #573b2b, inset -1px -1px 0 #c7b7af, inset 2px 2px 0 #6b4b27, inset -2px -2px 0 #af835f, inset 3px 3px 0 #976f4f, inset -3px -3px 0 #976f4f;color:#ffffff;text-shadow:1px 1px 0 #000000">Đang nhấn</button>
+      </div>
+      <div class="input" style="box-shadow:inset 1px 1px 0 #573b2b, inset -1px -1px 0 #c7b7af, inset 2px 2px 0 #6b4b27, inset -2px -2px 0 #af835f, inset 3px 3px 0 #976f4f, inset -3px -3px 0 #976f4f;color:#ffffff">Ô nhập (viền lõm)</div>
+    </div>
+  </div>
+  <div class="swatches"><i title="bevel[0] #c7b7af" style="background:#c7b7af"></i><i title="bevel[1] #af835f" style="background:#af835f"></i><i title="bevel[2] #976f4f" style="background:#976f4f"></i><i title="bevel[3] #976f4f" style="background:#976f4f"></i><i title="bevel[4] #6b4b27" style="background:#6b4b27"></i><i title="bevel[5] #573b2b" style="background:#573b2b"></i>
+    <span class="muted">text <i style="background:#ffffff"></i> focus <i style="background:#ffff00"></i> state <i style="background:#ffffff"></i></span></div>
+</section></div>
+<h2>5 phong cách phe (từ thanh HUD)</h2><p class="muted">Thanh HUD không scale: thanh trên neo trái; thanh dưới ghép 2 lớp (phần trái neo trái + 280px ô minimap neo phải). Thu/phóng cửa sổ để thử.</p><div class="grid full">
+<section class="card">
+  <header><b>Egyptian</b> <span class="muted">egyptian</span>
+    <span class="badge ok">chữ/nền 9.11:1</span></header>
+  <div class="hud-top" style="background-image:url('../../assets/ui/hud/egyptian-topbar.png')"></div>
+  <div class="hud-bottom" style="background-image:url('../../assets/ui/hud/egyptian-bottombar.png')"><div class="hud-cap" style="background-image:url('../../assets/ui/hud/egyptian-bottombar.png')"></div></div>
+  <div class="swatches"><i style="background:#ac815b"></i><i style="background:#caa47b"></i><i style="background:#d8b993"></i>
+    <span style="background:#caa47b;color:#000000;padding:2px 8px">Chữ trên nền phe</span></div>
+</section>
+<section class="card">
+  <header><b>Greek</b> <span class="muted">greek</span>
+    <span class="badge ok">chữ/nền 8.94:1</span></header>
+  <div class="hud-top" style="background-image:url('../../assets/ui/hud/greek-topbar.png')"></div>
+  <div class="hud-bottom" style="background-image:url('../../assets/ui/hud/greek-bottombar.png')"><div class="hud-cap" style="background-image:url('../../assets/ui/hud/greek-bottombar.png')"></div></div>
+  <div class="swatches"><i style="background:#939393"></i><i style="background:#a9a9a9"></i><i style="background:#bebebd"></i>
+    <span style="background:#a9a9a9;color:#000000;padding:2px 8px">Chữ trên nền phe</span></div>
+</section>
+<section class="card">
+  <header><b>Babylonian</b> <span class="muted">babylonian</span>
+    <span class="badge ok">chữ/nền 9.84:1</span></header>
+  <div class="hud-top" style="background-image:url('../../assets/ui/hud/babylonian-topbar.png')"></div>
+  <div class="hud-bottom" style="background-image:url('../../assets/ui/hud/babylonian-bottombar.png')"><div class="hud-cap" style="background-image:url('../../assets/ui/hud/babylonian-bottombar.png')"></div></div>
+  <div class="swatches"><i style="background:#3b3b3b"></i><i style="background:#454342"></i><i style="background:#5e534f"></i>
+    <span style="background:#454342;color:#ffffff;padding:2px 8px">Chữ trên nền phe</span></div>
+</section>
+<section class="card">
+  <header><b>Asian</b> <span class="muted">asian</span>
+    <span class="badge ok">chữ/nền 5.22:1</span></header>
+  <div class="hud-top" style="background-image:url('../../assets/ui/hud/asian-topbar.png')"></div>
+  <div class="hud-bottom" style="background-image:url('../../assets/ui/hud/asian-bottombar.png')"><div class="hud-cap" style="background-image:url('../../assets/ui/hud/asian-bottombar.png')"></div></div>
+  <div class="swatches"><i style="background:#5b524d"></i><i style="background:#8b653c"></i><i style="background:#9c7958"></i>
+    <span style="background:#8b653c;color:#ffffff;padding:2px 8px">Chữ trên nền phe</span></div>
+</section>
+<section class="card">
+  <header><b>Roman</b> <span class="muted">roman</span>
+    <span class="badge ok">chữ/nền 12.51:1</span></header>
+  <div class="hud-top" style="background-image:url('../../assets/ui/hud/roman-topbar.png')"></div>
+  <div class="hud-bottom" style="background-image:url('../../assets/ui/hud/roman-bottombar.png')"><div class="hud-cap" style="background-image:url('../../assets/ui/hud/roman-bottombar.png')"></div></div>
+  <div class="swatches"><i style="background:#22221f"></i><i style="background:#34342f"></i><i style="background:#464645"></i>
+    <span style="background:#34342f;color:#ffffff;padding:2px 8px">Chữ trên nền phe</span></div>
+</section></div>
+<h2>Màu người chơi (palette 50500, index 16×N)</h2><div class="player"><i style="background:#577bb3"></i>player-1 · blue <span class="ramp"><i style="background:#e3f7ff"></i><i style="background:#bbd7eb"></i><i style="background:#93bbd7"></i><i style="background:#739bc7"></i><i style="background:#577bb3"></i><i style="background:#3f5f9f"></i><i style="background:#273f8f"></i><i style="background:#17277b"></i><i style="background:#070f67"></i><i style="background:#000057"></i></span></div><div class="player"><i style="background:#ff2f2f"></i>player-2 · red <span class="ramp"><i style="background:#ffefef"></i><i style="background:#ffbfbf"></i><i style="background:#ff8f8f"></i><i style="background:#ff5f5f"></i><i style="background:#ff2f2f"></i><i style="background:#cf0a00"></i><i style="background:#b31500"></i><i style="background:#821c00"></i><i style="background:#660906"></i><i style="background:#530b00"></i></span></div><div class="player"><i style="background:#dfcf0f"></i>player-3 · yellow <span class="ramp"><i style="background:#ffffc7"></i><i style="background:#ffff9f"></i><i style="background:#ffff00"></i><i style="background:#e3e300"></i><i style="background:#dfcf0f"></i><i style="background:#c3a31b"></i><i style="background:#a37317"></i><i style="background:#876727"></i><i style="background:#6b4b27"></i><i style="background:#4f3723"></i></span></div><div class="player"><i style="background:#a3734f"></i>player-4 · brown <span class="ramp"><i style="background:#f3dbbb"></i><i style="background:#e7c373"></i><i style="background:#cfa343"></i><i style="background:#b78b2b"></i><i style="background:#a3734f"></i><i style="background:#8b5b37"></i><i style="background:#734727"></i><i style="background:#5f331b"></i><i style="background:#3f3723"></i><i style="background:#23231f"></i></span></div><div class="player"><i style="background:#f3770f"></i>player-5 · orange <span class="ramp"><i style="background:#ffdbb3"></i><i style="background:#ffc36f"></i><i style="background:#fb9f1f"></i><i style="background:#f78b17"></i><i style="background:#f3770f"></i><i style="background:#f06c07"></i><i style="background:#c75600"></i><i style="background:#964100"></i><i style="background:#803700"></i><i style="background:#632c00"></i></span></div><div class="player"><i style="background:#637b2f"></i>player-6 · green <span class="ramp"><i style="background:#afcf93"></i><i style="background:#9bb76f"></i><i style="background:#8b9f4f"></i><i style="background:#7f8b37"></i><i style="background:#637b2f"></i><i style="background:#4b6b2b"></i><i style="background:#375f27"></i><i style="background:#1b431b"></i><i style="background:#133313"></i><i style="background:#0b1b0b"></i></span></div><div class="player"><i style="background:#b3b3b3"></i>player-7 · grey <span class="ramp"><i style="background:#fefefe"></i><i style="background:#ebebeb"></i><i style="background:#dbdbdb"></i><i style="background:#c7c7c7"></i><i style="background:#b3b3b3"></i><i style="background:#8f8f8f"></i><i style="background:#6b6b6b"></i><i style="background:#474747"></i><i style="background:#373737"></i><i style="background:#232323"></i></span></div><div class="player"><i style="background:#00ab93"></i>player-8 · cyan <span class="ramp"><i style="background:#ebffef"></i><i style="background:#9fe7bb"></i><i style="background:#5fd39f"></i><i style="background:#2bbf93"></i><i style="background:#00ab93"></i><i style="background:#00837b"></i><i style="background:#006f6b"></i><i style="background:#004f4f"></i><i style="background:#003f43"></i><i style="background:#002327"></i></span></div>
+<h2>Màu ngữ nghĩa và trạng thái</h2><div class="player"><i style="background:#00bb37"></i>success #00bb37</div><div class="player"><i style="background:#ffb32b"></i>warning #ffb32b</div><div class="player"><i style="background:#ff2f2f"></i>danger #ff2f2f</div><div class="player"><i style="background:#577bb3"></i>info #577bb3</div><div class="player"><i style="background:#00bb37"></i>online #00bb37</div><div class="player"><i style="background:#ffb32b"></i>away #ffb32b</div><div class="player"><i style="background:#ff2f2f"></i>busy #ff2f2f</div><div class="player"><i style="background:#577bb3"></i>in-game #577bb3</div><div class="player"><i style="background:#8f8f8f"></i>offline #8f8f8f</div>
+</body></html>

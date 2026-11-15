@@ -1,0 +1,75 @@
+{
+  "id": 50404,
+  "drs": "interfac",
+  "num_frames": 7,
+  "palette_id": 50500,
+  "sheet_width": 196,
+  "sheet_height": 49,
+  "sheet_png": "interfac/50404_sheet.png",
+  "frames_dir": "interfac/50404_frames",
+  "frames": [
+    {
+      "frame": 0,
+      "x": 0,
+      "y": 0,
+      "width": 26,
+      "height": 49,
+      "hotspot_x": 13,
+      "hotspot_y": 37
+    },
+    {
+      "frame": 1,
+      "x": 28,
+      "y": 0,
+      "width": 26,
+      "height": 49,
+      "hotspot_x": 13,
+      "hotspot_y": 37
+    },
+    {
+      "frame": 2,
+      "x": 56,
+      "y": 0,
+      "width": 26,
+      "height": 49,
+      "hotspot_x": 13,
+      "hotspot_y": 37
+    },
+    {
+      "frame": 3,
+      "x": 84,
+      "y": 0,
+      "width": 26,
+      "height": 49,
+      "hotspot_x": 13,
+      "hotspot_y": 37
+    },
+    {
+      "frame": 4,
+      "x": 112,
+      "y": 0,
+      "width": 26,
+      "height": 49,
+      "hotspot_x": 13,
+      "hotspot_y": 37
+    },
+    {
+      "frame": 5,
+      "x": 140,
+      "y": 0,
+      "width": 26,
+      "height": 49,
+      "hotspot_x": 13,
+      "hotspot_y": 37
+    },
+    {
+      "frame": 6,
+      "x": 168,
+      "y": 0,
+      "width": 26,
+      "height": 49,
+      "hotspot_x": 13,
+      "hotspot_y": 37
+    }
+  ]
+}

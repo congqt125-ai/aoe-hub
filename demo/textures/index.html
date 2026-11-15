@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="vi" data-theme="hub-village">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Thử texture hộp thoại — AoE Hub</title>
+<!-- Trang thử: nền theo theme màn hình (ảnh mới hub-* hoặc scr1/scr2 của game) + chọn texture hộp thoại. Chỉ dùng token từ tokens/aoe-theme.css. -->
+<link rel="stylesheet" href="../../tokens/aoe-theme.css">
+<style>
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    display: flex; flex-direction: column; height: 100vh;
+    font: 14px/1.45 var(--aoe-font-body); color: var(--aoe-text);
+  }
+
+  /* ---- Toolbar (review only) ---- */
+  .bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 20px; padding: 8px 16px;
+         background: rgba(0,0,0,.8); color: #fff; font-size: 13px; }
+  .bar strong { font: 600 16px var(--aoe-font-heading); }
+  .group { display: inline-flex; align-items: center; gap: 4px; }
+  .bar button { font: 12px var(--aoe-font-body); color: #fff; background: rgba(255,255,255,.1);
+                border: 1px solid rgba(255,255,255,.25); padding: 3px 9px; }
+  .bar button[aria-pressed="true"] { background: rgba(255,255,255,.3); }
+  .bar button:focus-visible, .bar input:focus-visible { outline: 1px dashed var(--aoe-focus); outline-offset: 2px; }
+  .swatch { display: inline-block; width: 14px; height: 14px; margin-right: 5px; vertical-align: -3px;
+            background: var(--dlg-texture) center / 200% auto; box-shadow: 0 0 0 1px #000; }
+  output { min-width: 3.5em; font-variant-numeric: tabular-nums; }
+
+  /* ---- Stage ---- */
+  main { flex: 1; min-height: 0; overflow: auto; display: flex; align-items: center; justify-content: center; padding: 24px 16px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 24px; width: min(1180px, 100%); }
+  [data-view="single"] .grid { display: flex; justify-content: center; }
+
+  /* ---- Sample dialog (Dialog organism look) ---- */
+  .dialog { position: relative; width: min(420px, 100%); padding: 20px 24px 22px; }
+  .grid .dialog { width: 100%; }
+  .dialog h2 { margin: 0 0 4px; text-align: center; font: 600 22px/1.2 var(--aoe-font-heading); }
+  .dialog .tag { display: block; margin-bottom: 14px; text-align: center; font-size: 12px; opacity: .8; }
+  .dialog p { margin: 0 0 14px; }
+  .close { position: absolute; top: 8px; right: 8px; width: 26px; height: 26px; border: 0;
+           background: var(--t-ctl-close-normal) center / 100% 100%; }
+  .close:active { background-image: var(--t-ctl-close-pressed); }
+  .field { margin-bottom: 12px; }
+  .field label { display: block; margin-bottom: 4px; font: 600 13px var(--aoe-font-heading); }
+  .field input { width: 100%; height: 32px; padding: 0 10px; border: 0; outline: 0; font: 14px var(--aoe-font-body);
+                 color: var(--dlg-state); background: rgba(0,0,0,.7); }
+  .field input:focus-visible { outline: 1px dashed var(--dlg-focus); outline-offset: 2px; }
+  .well { margin: 0 0 14px; padding: 6px 10px; font-size: 13px; text-shadow: none; }
+  .well .ok { color: var(--aoe-success-on-dark); } .well .bad { color: var(--aoe-danger-on-dark); }
+  .check { display: inline-flex; align-items: center; gap: 8px; margin-bottom: 16px; }
+  .check input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+  .check .box { width: 26px; height: 26px; background: var(--t-ctl-checkbox-off-normal) center / 100% 100%; }
+  .check input:checked + .box { background-image: var(--t-ctl-checkbox-on-normal); }
+  .check:active .box { background-image: var(--t-ctl-checkbox-off-pressed); }
+  .check:active input:checked + .box { background-image: var(--t-ctl-checkbox-on-pressed); }
+  .check input:focus-visible + .box { outline: 1px dashed var(--dlg-focus); outline-offset: 2px; }
+  .actions { display: flex; justify-content: flex-end; gap: 10px; }
+  .btn { min-width: 110px; height: 34px; padding: 0 16px; border: 0; font: 600 15px var(--aoe-font-heading);
+         color: var(--dlg-text); text-shadow: 1px 1px 0 #000; }
+  /* Secondary = dark; primary keeps the texture from .surface-dialog. */
+  .btn:not(.primary) { background: rgba(0,0,0,.5); }
+  .btn:hover { color: var(--dlg-focus); }
+  .btn:active { padding-top: 2px; padding-left: 18px; }
+  .btn:focus-visible { outline: 1px dashed var(--dlg-focus); outline-offset: -6px; }
+  .btn:active.bevel-raised { box-shadow:
+    inset 1px 1px 0 var(--b5), inset -1px -1px 0 var(--b0), inset 2px 2px 0 var(--b4), inset -2px -2px 0 var(--b1),
+    inset 3px 3px 0 var(--b3), inset -3px -3px 0 var(--b2); }
+</style>
+</head>
+<body class="surface-screen-bg" data-view="single">
+<div class="bar" role="toolbar" aria-label="Tuỳ chọn trang thử">
+  <strong>Texture hộp thoại</strong>
+  <span class="group" id="textures" aria-label="Chọn texture"></span>
+  <span class="group" aria-label="Cách xem">
+    <button type="button" data-view="single" aria-pressed="true">Một hộp thoại</button>
+    <button type="button" data-view="all" aria-pressed="false">So sánh tất cả</button>
+  </span>
+  <span class="group" id="backgrounds" aria-label="Chọn ảnh nền">Nền:</span>
+</div>
+
+<main><div class="grid" id="stage"></div></main>
+
+<template id="dialog-tpl">
+  <form class="dialog surface-dialog tone-dialog bevel-raised" novalidate>
+    <button type="button" class="close" aria-label="Đóng"></button>
+    <h2>Vào phòng</h2>
+    <span class="tag"></span>
+    <p>Phòng “4v4 Đồng cỏ” có mật khẩu. Nhập mật khẩu để vào cùng bạn bè.</p>
+    <div class="field">
+      <label>Mật khẩu phòng</label>
+      <input type="password" value="aoe1997">
+    </div>
+    <div class="well surface-well"><span class="ok">● 5/8 người · 64 ms</span> · <span class="bad">Còn 3 chỗ</span></div>
+    <label class="check"><input type="checkbox" checked><span class="box" aria-hidden="true"></span>Nhớ mật khẩu phòng này</label>
+    <div class="actions">
+      <button type="button" class="btn tone-dialog bevel-raised">Huỷ</button>
+      <button type="submit" class="btn primary surface-dialog tone-dialog bevel-raised">Vào phòng</button>
+    </div>
+  </form>
+</template>
+
+<script>
+  // Dialog themes that carry a texture (assets/ui/dialog/<theme>-<material>.png).
+  const TEXTURES = [
+    { theme: "dlg6_0", label: "Sa thạch", file: "sandstone" },
+    { theme: "dlg6_1", label: "Cẩm thạch", file: "marble" },
+    { theme: "dlg6_2", label: "Gạch", file: "brick" },
+    { theme: "dlg6_3", label: "Gỗ", file: "wood" },
+    { theme: "dlg6_4", label: "Đá đen", file: "darkstone" },
+    { theme: "dlg3", label: "Cát", file: "sand" },
+    // Own artwork (tools/gen_hub_art.py), copyright-free.
+    { theme: "hub-wood", label: "Gỗ tự làm", path: "hub/dialog/wood.png" },
+  ];
+  // Screen themes (data-theme): hub-* use the new pictures that replace scr1 / scr2.
+  const BACKGROUNDS = [
+    { id: "hub-village", label: "Làng (ảnh mới)" },
+    { id: "hub-temple", label: "Đền (ảnh mới)" },
+    { id: "scr2", label: "scr2 (game)" },
+    { id: "scr1", label: "scr1 (game)" },
+  ];
+  const $ = id => document.getElementById(id);
+  const tpl = $("dialog-tpl");
+  const state = { theme: "hub-wood", view: "single", bg: "hub-village" };
+
+  function load() {
+    try {
+      const q = new URLSearchParams(location.search);
+      const saved = JSON.parse(localStorage.getItem("aoe-texture-test") || "{}");
+      Object.assign(state, saved);
+      if (q.get("texture")) state.theme = (TEXTURES.find(t => t.file === q.get("texture") || t.theme === q.get("texture")) || {}).theme || state.theme;
+      if (q.get("view")) state.view = q.get("view") === "all" ? "all" : "single";
+      if (BACKGROUNDS.some(b => b.id === q.get("bg"))) state.bg = q.get("bg");
+    } catch {}
+    if (!TEXTURES.some(t => t.theme === state.theme)) state.theme = "hub-wood";
+    if (!BACKGROUNDS.some(b => b.id === state.bg)) state.bg = "hub-village";
+    delete state.shade; // older saved state; the tuner owns the dialog shade now
+  }
+  function save() { try { localStorage.setItem("aoe-texture-test", JSON.stringify(state)); } catch {} }
+
+  // url() inside a CSS variable resolves against the stylesheet that *uses* it, not tokens/aoe-theme.css.
+  // Static pages (no Vite) therefore rewrite the url variables to absolute URLs on each themed element.
+  const THEME_CSS = document.querySelector('link[href$="aoe-theme.css"]').href;
+  const URL_VARS = ["--dlg-texture", "--t-ctl-close-normal", "--t-ctl-close-pressed",
+    ...["off", "on"].flatMap(s => ["normal", "pressed"].map(p => `--t-ctl-checkbox-${s}-${p}`))];
+  function absolutizeUrlVars(el) {
+    const cs = getComputedStyle(el);
+    for (const name of URL_VARS) {
+      const m = cs.getPropertyValue(name).match(/url\(["']?([^"')]+)["']?\)/);
+      if (m) el.style.setProperty(name, `url("${new URL(m[1], THEME_CSS).href}")`);
+    }
+  }
+
+  function makeDialog(t) {
+    const node = tpl.content.firstElementChild.cloneNode(true);
+    node.dataset.dialogTheme = t.theme;
+    node.setAttribute("aria-label", `Hộp thoại mẫu — ${t.label}`);
+    node.querySelector(".tag").textContent = `${t.label} · ${t.theme} · ${t.path ?? `ui/dialog/${t.theme}-${t.file}.png`}`;
+    // Unique ids per copy so labels stay wired in the comparison view.
+    const input = node.querySelector("input[type=password]");
+    input.id = `pw-${t.theme}`;
+    node.querySelector(".field label").htmlFor = input.id;
+    node.addEventListener("submit", e => e.preventDefault());
+    return node;
+  }
+
+  function render() {
+    document.body.dataset.view = state.view;
+    const bg = BACKGROUNDS.find(b => b.id === state.bg) || BACKGROUNDS[0];
+    document.documentElement.dataset.theme = bg.id;
+    document.querySelectorAll("[data-bg]").forEach(b => b.setAttribute("aria-pressed", b.dataset.bg === bg.id));
+    const list = state.view === "all" ? TEXTURES : TEXTURES.filter(t => t.theme === state.theme);
+    $("stage").replaceChildren(...list.map(makeDialog));
+    document.querySelectorAll("#stage .dialog").forEach(absolutizeUrlVars);
+    document.querySelectorAll("[data-texture]").forEach(b => b.setAttribute("aria-pressed", b.dataset.texture === state.theme));
+    document.querySelectorAll("[data-view]").forEach(b => b.matches("button") && b.setAttribute("aria-pressed", b.dataset.view === state.view));
+    save();
+  }
+
+  for (const t of TEXTURES) {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.dataset.texture = t.theme;
+    b.innerHTML = `<span class="swatch" data-dialog-theme="${t.theme}"></span>${t.label}`;
+    b.addEventListener("click", () => { state.theme = t.theme; state.view = "single"; render(); });
+    $("textures").append(b);
+    absolutizeUrlVars(b.querySelector(".swatch"));
+  }
+  for (const bg of BACKGROUNDS) {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.dataset.bg = bg.id;
+    b.textContent = bg.label;
+    b.addEventListener("click", () => { state.bg = bg.id; render(); });
+    $("backgrounds").append(b);
+  }
+  document.querySelectorAll("button[data-view]").forEach(b => b.addEventListener("click", () => { state.view = b.dataset.view; render(); }));
+  load();
+  render();
+</script>
+<!-- Review-only: sliders for background / dialog treatment (Alt+T). -->
+<script src="../shared/tuner.js"></script>
+</body>
+</html>

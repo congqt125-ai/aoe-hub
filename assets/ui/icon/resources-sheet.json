@@ -1,0 +1,48 @@
+{
+  "id": 50732,
+  "drs": "interfac",
+  "num_frames": 4,
+  "palette_id": 50500,
+  "sheet_width": 144,
+  "sheet_height": 30,
+  "sheet_png": "interfac/50732_sheet.png",
+  "frames_dir": "interfac/50732_frames",
+  "frames": [
+    {
+      "frame": 0,
+      "x": 0,
+      "y": 0,
+      "width": 34,
+      "height": 30,
+      "hotspot_x": 0,
+      "hotspot_y": 0
+    },
+    {
+      "frame": 1,
+      "x": 36,
+      "y": 0,
+      "width": 34,
+      "height": 30,
+      "hotspot_x": 0,
+      "hotspot_y": 0
+    },
+    {
+      "frame": 2,
+      "x": 72,
+      "y": 0,
+      "width": 34,
+      "height": 30,
+      "hotspot_x": 0,
+      "hotspot_y": 0
+    },
+    {
+      "frame": 3,
+      "x": 108,
+      "y": 0,
+      "width": 34,
+      "height": 30,
+      "hotspot_x": 0,
+      "hotspot_y": 0
+    }
+  ]
+}
